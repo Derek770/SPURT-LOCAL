@@ -22,30 +22,30 @@ export default function RegisterPage() {
   const sportsData = [
     {
       sport: 'Cricket',
-      icon: '??',
       tagline: 'Box Turf & Leather Matches',
       quote: 'Join 8v8 box cricket matches and T20 fixtures in your neighborhood.',
+      venue: 'Pari Chowk Turf Arena, Greater Noida',
       image: 'https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?w=1920&auto=format&fit=crop&q=90'
     },
     {
       sport: 'Football',
-      icon: '?',
       tagline: '5v5 AstroTurf & Weekend 11s',
       quote: 'Floodlit night games, fast-paced 5s, and guaranteed zero ghosting.',
+      venue: 'KickOff Arena, Sector 104, Noida',
       image: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=1920&auto=format&fit=crop&q=90'
     },
     {
       sport: 'Badminton',
-      icon: '??',
       tagline: 'Singles & Doubles Partners',
       quote: 'Indoor wooden court ladders, mixed doubles, and quick slot locks.',
+      venue: 'Smash Academy, Knowledge Park 3',
       image: 'https://images.unsplash.com/photo-1626224583764-f87db24ac4ea?w=1920&auto=format&fit=crop&q=90'
     },
     {
       sport: 'Table Tennis',
-      icon: '??',
       tagline: 'Ranked 1v1 Elo Duels',
       quote: 'Topspin rallies, fast reaction duels, and local weekend tournaments.',
+      venue: 'DLF Prime TT Club, South Delhi',
       image: 'https://images.unsplash.com/photo-1609710228159-0fa9bd7c0827?w=1920&auto=format&fit=crop&q=90'
     }
   ];
@@ -100,7 +100,7 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#070D18] flex items-center justify-center relative overflow-hidden selection:bg-emerald-500 selection:text-white">
+    <div className="min-h-screen bg-[#070D18] relative overflow-hidden flex items-center justify-center selection:bg-emerald-500 selection:text-white">
       
       {/* 4K Background */}
       <div className="absolute inset-0 z-0 overflow-hidden">
@@ -116,76 +116,69 @@ export default function RegisterPage() {
               alt={s.sport} 
               className="w-full h-full object-cover animate-kenburns"
             />
-            <div className="absolute inset-0 bg-gradient-to-r from-[#070D18]/95 via-[#070D18]/85 to-[#070D18]/50 lg:to-[#070D18]/30"></div>
+            <div className="absolute inset-0 bg-gradient-to-r from-[#070D18]/95 via-[#070D18]/85 to-[#070D18]/45 md:to-[#070D18]/30"></div>
             <div className="absolute inset-0 bg-gradient-to-t from-[#070D18] via-transparent to-[#070D18]/70"></div>
           </div>
         ))}
       </div>
 
-      <div className="relative z-10 max-w-7xl w-full mx-auto grid grid-cols-1 lg:grid-cols-12 min-h-screen items-center p-4 sm:p-8 lg:p-12 gap-8 lg:gap-12">
+      <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-8 py-10 flex flex-col md:flex-row items-center justify-between gap-10 min-h-screen">
         
-        {/* LEFT COLUMN: About Spurt Onboarding */}
-        <div className="hidden lg:flex lg:col-span-6 flex-col justify-between min-h-[580px] p-4 text-white">
-          <div>
-            <Link href="/" className="inline-flex items-center gap-3.5 group">
-              <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-cyan-500 via-emerald-400 to-orange-500 flex items-center justify-center text-white font-black text-lg shadow-2xl group-hover:rotate-12 transition-transform">
-                <Zap className="w-6 h-6 fill-white" />
-              </div>
-              <div className="flex flex-col">
-                <span className="font-display font-black text-2xl xl:text-3xl tracking-tight text-white leading-none">
-                  SPURT<span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-300">LOCAL</span>
-                </span>
-                <span className="text-[10px] uppercase tracking-widest text-emerald-400 font-bold mt-0.5">
-                  Athlete Onboarding Hub
-                </span>
-              </div>
-            </Link>
-
-            <div className="mt-10 space-y-4">
-              <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-slate-900/85 border border-emerald-500/30 text-emerald-300 text-xs font-semibold backdrop-blur-xl shadow-2xl animate-float">
-                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
-                <span>Verified Matchmaking Network</span>
-              </div>
-
-              <h1 className="font-display font-black text-4xl xl:text-5xl leading-[1.1] uppercase max-w-lg drop-shadow-2xl">
-                JOIN YOUR<br />
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-teal-300 to-cyan-400">
-                  NEIGHBORHOOD SQUAD.
-                </span>
-              </h1>
-
-              <p className="text-slate-200 text-sm xl:text-base max-w-lg font-medium leading-relaxed drop-shadow-lg">
-                "{currentSport.quote}"
-              </p>
+        {/* LEFT SIDE: Onboarding Info */}
+        <div className="w-full md:w-1/2 flex flex-col justify-center text-white py-6">
+          <Link href="/" className="inline-flex items-center gap-3 mb-6 group w-fit">
+            <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-cyan-500 via-emerald-400 to-orange-500 flex items-center justify-center text-white font-black text-lg shadow-2xl group-hover:rotate-12 transition-transform">
+              <Zap className="w-6 h-6 fill-white" />
             </div>
+            <div className="flex flex-col">
+              <span className="font-display font-black text-2xl sm:text-3xl tracking-tight text-white leading-none">
+                SPURT<span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-300">LOCAL</span>
+              </span>
+              <span className="text-[10px] uppercase tracking-widest text-emerald-400 font-bold mt-0.5">
+                Athlete Onboarding Network
+              </span>
+            </div>
+          </Link>
+
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-900/90 border border-emerald-500/40 text-emerald-300 text-xs font-semibold backdrop-blur-xl shadow-xl w-fit mb-4">
+            <MapPin className="w-3.5 h-3.5 text-emerald-400" />
+            <span>{currentSport.venue}</span>
           </div>
 
-          <div className="glass-panel p-3 rounded-2xl border border-white/10 max-w-xl backdrop-blur-xl">
-            <div className="grid grid-cols-4 gap-2">
-              {sportsData.map((s, idx) => (
-                <button
-                  key={s.sport}
-                  onClick={() => setActiveSportIndex(idx)}
-                  className={`py-2 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
-                    idx === activeSportIndex
-                      ? 'bg-gradient-to-r from-emerald-500 to-teal-400 text-black shadow-xl glow-emerald scale-105'
-                      : 'bg-slate-900/70 hover:bg-slate-800 text-slate-300 border border-white/5'
-                  }`}
-                >
-                  <span>{s.icon}</span>
-                  <span className="truncate">{s.sport}</span>
-                </button>
-              ))}
-            </div>
+          <h1 className="font-display font-black text-4xl sm:text-5xl lg:text-6xl text-white tracking-tight uppercase leading-[1.08] drop-shadow-2xl">
+            JOIN YOUR<br />
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-teal-300 to-cyan-400">
+              NEIGHBORHOOD SQUAD.
+            </span>
+          </h1>
+
+          <p className="text-slate-200 text-sm sm:text-base max-w-lg mt-4 font-medium leading-relaxed drop-shadow">
+            "{currentSport.quote}"
+          </p>
+
+          <div className="flex flex-wrap gap-2 mt-8">
+            {sportsData.map((s, idx) => (
+              <button
+                key={s.sport}
+                onClick={() => setActiveSportIndex(idx)}
+                className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${
+                  idx === activeSportIndex
+                    ? 'bg-gradient-to-r from-emerald-500 to-teal-400 text-black shadow-xl glow-emerald scale-105'
+                    : 'bg-slate-900/75 hover:bg-slate-800 text-slate-300 border border-white/10'
+                }`}
+              >
+                {s.sport}
+              </button>
+            ))}
           </div>
         </div>
 
-        {/* RIGHT COLUMN: Register Form */}
-        <div className="lg:col-span-6 w-full max-w-lg mx-auto">
-          <div className="glass-card rounded-3xl border border-white/20 p-7 sm:p-9 shadow-2xl backdrop-blur-3xl relative overflow-hidden">
+        {/* RIGHT SIDE: Register Card */}
+        <div className="w-full md:w-auto md:min-w-[420px] max-w-lg">
+          <div className="glass-card rounded-3xl border border-white/20 p-8 sm:p-10 shadow-2xl backdrop-blur-3xl relative overflow-hidden">
             <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-400"></div>
 
-            <div className="text-center lg:text-left mb-6">
+            <div className="text-left mb-6">
               <h2 className="font-display font-extrabold text-2xl sm:text-3xl text-white">Create Athlete Profile</h2>
               <p className="text-xs text-slate-400 mt-1">Get verified to join live match lobbies across NCR.</p>
             </div>
@@ -257,10 +250,10 @@ export default function RegisterPage() {
                   onChange={(e) => setPreferredArea(e.target.value)}
                   className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-white/15 text-xs text-white focus:outline-none focus:border-emerald-500"
                 >
-                  <option value="Greater Noida (Pari Chowk & KP3)">?? Greater Noida (Pari Chowk & KP3)</option>
-                  <option value="Noida Sector 62 / 104">?? Noida Sector 62 / 104</option>
-                  <option value="South Delhi (Saket / Siri Fort)">?? South Delhi (Saket / Siri Fort)</option>
-                  <option value="Dwarka Sports Complex">?? Dwarka Sports Complex</option>
+                  <option value="Greater Noida (Pari Chowk & KP3)">Greater Noida (Pari Chowk & KP3)</option>
+                  <option value="Noida Sector 62 / 104">Noida Sector 62 / 104</option>
+                  <option value="South Delhi (Saket / Siri Fort)">South Delhi (Saket / Siri Fort)</option>
+                  <option value="Dwarka Sports Complex">Dwarka Sports Complex</option>
                 </select>
               </div>
 
@@ -268,10 +261,10 @@ export default function RegisterPage() {
                 <label className="text-xs font-bold text-slate-300 uppercase tracking-wider block mb-1">Select Sports</label>
                 <div className="grid grid-cols-2 gap-2">
                   {[
-                    { id: 'cricket', label: '?? Cricket' },
-                    { id: 'football', label: '? Football' },
-                    { id: 'badminton', label: '?? Badminton' },
-                    { id: 'table_tennis', label: '?? Table Tennis' },
+                    { id: 'cricket', label: 'Cricket' },
+                    { id: 'football', label: 'Football' },
+                    { id: 'badminton', label: 'Badminton' },
+                    { id: 'table_tennis', label: 'Table Tennis' },
                   ].map((s) => (
                     <button
                       type="button"
@@ -280,7 +273,7 @@ export default function RegisterPage() {
                       className={`py-2 px-3 rounded-xl border text-xs font-semibold transition text-left flex items-center justify-between ${
                         sports.includes(s.id) 
                           ? 'border-emerald-500 bg-emerald-500/20 text-emerald-300' 
-                          : 'border-white/10 bg-slate-900/60 text-slate-400 hover:border-white/20'
+                          : 'border-white/10 bg-slate-900/60 text-slate-400'
                       }`}
                     >
                       <span>{s.label}</span>
