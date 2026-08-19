@@ -235,7 +235,7 @@ export default function HomePage() {
           </div>
         </div>
         <div className="text-center sm:text-left mt-6 text-slate-500 text-[11px]">
-          ? 2026 Spurt Local. Built for athletes who want to play, match, and repeat.
+          ? 2026 SPURT LOCAL. Designed & Created with ? by Yashwant Sonkar.
         </div>
       </footer>
 

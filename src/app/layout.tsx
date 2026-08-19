@@ -4,7 +4,9 @@ import { AuthProvider } from '@/context/AuthContext';
 
 export const metadata: Metadata = {
   title: 'SPURT LOCAL - Hyper-Local Sports Matchmaking in Delhi & Greater Noida',
-  description: 'Join verified local match lobbies for Cricket, Football, Badminton & Table Tennis in under 60 seconds.',
+  description: 'Join verified local match lobbies for Cricket, Football, Badminton & Table Tennis in under 60 seconds. Created by Yashwant Sonkar.',
+  authors: [{ name: 'Yashwant Sonkar' }],
+  creator: 'Yashwant Sonkar',
 };
 
 export default function RootLayout({

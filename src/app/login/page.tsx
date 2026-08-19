@@ -275,6 +275,9 @@ export default function LoginPage() {
               </Link>
             </div>
 
+            <div className="text-center mt-3 text-[11px] text-slate-500">
+              Crafted with ? by <span className="text-slate-300 font-bold">Yashwant Sonkar</span>
+            </div>
           </div>
         </div>
 
