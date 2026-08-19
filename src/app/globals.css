@@ -1,0 +1,120 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+
+:root {
+  --bg-dark: #070d18;
+  --bg-card: rgba(15, 26, 46, 0.75);
+  --accent-orange: #ff5722;
+  --accent-emerald: #00e676;
+  --accent-cyan: #00d2ff;
+}
+
+body {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  background-color: #070d18;
+  color: #f8fafc;
+  overflow-x: hidden;
+}
+
+.font-display {
+  font-family: 'Outfit', sans-serif;
+}
+
+.glass-panel {
+  background: rgba(15, 26, 46, 0.65);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.glass-nav {
+  background: rgba(7, 13, 24, 0.85);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.glass-card {
+  background: rgba(15, 26, 46, 0.7);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.glass-card-hover {
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.glass-card-hover:hover {
+  transform: translateY(-4px);
+  border-color: rgba(0, 210, 255, 0.4);
+  box-shadow: 0 16px 32px -10px rgba(0, 210, 255, 0.18);
+}
+
+.glow-orange {
+  box-shadow: 0 0 35px rgba(255, 87, 34, 0.5);
+}
+.glow-orange:hover {
+  box-shadow: 0 0 50px rgba(255, 87, 34, 0.8);
+}
+
+.glow-emerald {
+  box-shadow: 0 0 25px rgba(0, 230, 118, 0.4);
+}
+
+/* Quad-split hero accordion */
+.hero-split-container {
+  display: flex;
+  transition: all 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.hero-sport-panel {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  transition: flex 0.5s cubic-bezier(0.2, 0.8, 0.2, 1), filter 0.4s ease;
+  min-height: 480px;
+}
+
+@media (min-width: 1024px) {
+  .hero-sport-panel {
+    min-height: 560px;
+  }
+  .hero-split-container:hover .hero-sport-panel {
+    flex: 0.75;
+    filter: brightness(0.65);
+  }
+  .hero-split-container .hero-sport-panel:hover {
+    flex: 1.75;
+    filter: brightness(1.05);
+  }
+}
+
+.scrim-gradient {
+  background: linear-gradient(
+    to top,
+    rgba(7, 13, 24, 0.95) 0%,
+    rgba(7, 13, 24, 0.5) 45%,
+    rgba(7, 13, 24, 0.15) 100%
+  );
+}
+
+.scrim-radial-hero {
+  background: radial-gradient(
+    circle at 50% 60%,
+    rgba(7, 13, 24, 0.3) 0%,
+    rgba(7, 13, 24, 0.92) 80%
+  );
+}
+
+.modal-backdrop {
+  background: rgba(4, 8, 16, 0.85);
+  backdrop-filter: blur(12px);
+}
+
+@keyframes float-badge {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-6px); }
+}
+.animate-float {
+  animation: float-badge 4s infinite ease-in-out;
+}
