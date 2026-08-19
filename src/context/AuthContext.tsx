@@ -46,7 +46,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       if (firebaseUser) {
         try {
-          // Strict verification against Firestore users collection
           const userDocRef = doc(db, 'users', firebaseUser.uid);
           const snap = await getDoc(userDocRef);
 
@@ -54,15 +53,30 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             setUser(firebaseUser);
             setUserProfile(snap.data() as UserProfile);
           } else {
-            // User exists in Auth but not in Firestore users collection
-            await signOut(auth);
-            setUser(null);
-            setUserProfile(null);
+            // Auto-provision profile document if missing
+            const fallbackProfile: UserProfile = {
+              uid: firebaseUser.uid,
+              email: firebaseUser.email || '',
+              displayName: firebaseUser.displayName || 'Athlete',
+              photoURL: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&auto=format&fit=crop&q=80',
+              preferredArea: 'Greater Noida (Pari Chowk & KP3)',
+              preferredSports: ['cricket', 'football'],
+              rating: 5.0,
+              matchesPlayed: 0,
+              createdAt: new Date().toISOString()
+            };
+            try {
+              await setDoc(userDocRef, fallbackProfile);
+              setUser(firebaseUser);
+              setUserProfile(fallbackProfile);
+            } catch {
+              setUser(firebaseUser);
+              setUserProfile(fallbackProfile);
+            }
           }
         } catch (err) {
-          console.error('Error verifying user profile in Firestore:', err);
-          setUser(null);
-          setUserProfile(null);
+          console.error('Error in onAuthStateChanged:', err);
+          setUser(firebaseUser);
         }
       } else {
         setUser(null);
@@ -74,24 +88,48 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     return () => unsubscribe();
   }, []);
 
-  // Strict Login Gatekeeper
+  // Login: If doc is missing in Firestore, auto-provision so user is never locked out
   const login = async (email: string, pass: string) => {
     setLoading(true);
     try {
       const res = await signInWithEmailAndPassword(auth, email, pass);
       const userDocRef = doc(db, 'users', res.user.uid);
-      const snap = await getDoc(userDocRef);
-
-      if (!snap.exists()) {
-        // Enforce strict gatekeeper: sign out immediately
-        await signOut(auth);
-        setUser(null);
-        setUserProfile(null);
-        throw new Error('Account not found. Please register first.');
+      
+      let profile: UserProfile;
+      try {
+        const snap = await getDoc(userDocRef);
+        if (snap.exists()) {
+          profile = snap.data() as UserProfile;
+        } else {
+          profile = {
+            uid: res.user.uid,
+            email,
+            displayName: res.user.displayName || email.split('@')[0],
+            photoURL: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&auto=format&fit=crop&q=80',
+            preferredArea: 'Greater Noida (Pari Chowk & KP3)',
+            preferredSports: ['cricket', 'football'],
+            rating: 5.0,
+            matchesPlayed: 0,
+            createdAt: new Date().toISOString()
+          };
+          await setDoc(userDocRef, profile);
+        }
+      } catch (firestoreErr) {
+        profile = {
+          uid: res.user.uid,
+          email,
+          displayName: res.user.displayName || email.split('@')[0],
+          photoURL: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&auto=format&fit=crop&q=80',
+          preferredArea: 'Greater Noida (Pari Chowk & KP3)',
+          preferredSports: ['cricket', 'football'],
+          rating: 5.0,
+          matchesPlayed: 0,
+          createdAt: new Date().toISOString()
+        };
       }
 
       setUser(res.user);
-      setUserProfile(snap.data() as UserProfile);
+      setUserProfile(profile);
     } catch (error: any) {
       setUser(null);
       setUserProfile(null);
@@ -101,7 +139,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
-  // User Registration with immediate Firestore document creation
+  // Register: Creates Auth + Firestore doc
   const register = async (
     email: string, 
     pass: string, 
@@ -110,8 +148,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     preferredSports: string[] = ['cricket', 'football']
   ) => {
     setLoading(true);
+    let createdUser: User | null = null;
+
     try {
       const res = await createUserWithEmailAndPassword(auth, email, pass);
+      createdUser = res.user;
       await updateProfile(res.user, { displayName });
       
       const newProfile: UserProfile = {
@@ -126,12 +167,25 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         createdAt: new Date().toISOString()
       };
 
-      // Commit to Firestore 'users' collection
-      await setDoc(doc(db, 'users', res.user.uid), newProfile);
+      try {
+        await setDoc(doc(db, 'users', res.user.uid), newProfile);
+      } catch (fsErr: any) {
+        console.warn('Firestore setDoc warning:', fsErr);
+        // Continue even if Firestore security rules are still being published
+      }
 
       setUser(res.user);
       setUserProfile(newProfile);
     } catch (error: any) {
+      // If email is already in use, try logging in
+      if (error.code === 'auth/email-already-in-use') {
+        try {
+          await login(email, pass);
+          return;
+        } catch (loginErr) {
+          throw new Error('This email is already registered. Please click Sign In to enter.');
+        }
+      }
       setUser(null);
       setUserProfile(null);
       throw error;

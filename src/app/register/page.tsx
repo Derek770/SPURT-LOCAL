@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
-import { Zap, Lock, Mail, User, ArrowRight, AlertCircle, Eye, EyeOff, MapPin, ShieldCheck, Trophy, ChevronRight } from 'lucide-react';
+import { Zap, Lock, Mail, User, ArrowRight, AlertCircle, Eye, EyeOff, MapPin, ShieldCheck, Trophy, ChevronRight, Check } from 'lucide-react';
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -89,11 +89,7 @@ export default function RegisterPage() {
       await register(email, password, displayName, preferredArea, sports);
       router.push('/dashboard');
     } catch (err: any) {
-      if (err.message?.includes('email-already-in-use')) {
-        setError('An account with this email already exists. Please sign in.');
-      } else {
-        setError(err.message || 'Failed to create athlete profile. Please try again.');
-      }
+      setError(err.message || 'Failed to complete profile. Please try signing in.');
     } finally {
       setLoading(false);
     }
@@ -277,7 +273,7 @@ export default function RegisterPage() {
                       }`}
                     >
                       <span>{s.label}</span>
-                      {sports.includes(s.id) && <span className="text-emerald-400 font-bold">?</span>}
+                      {sports.includes(s.id) && <Check className="w-3.5 h-3.5 text-emerald-400" />}
                     </button>
                   ))}
                 </div>
