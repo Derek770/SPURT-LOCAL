@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Search, Plus } from 'lucide-react';
+import { Search, PlusCircle, Trophy, Sparkles } from 'lucide-react';
 import { MatchItem, SportType, UserProfile } from '@/types';
 import { MatchCard } from './MatchCard';
 
@@ -53,7 +53,9 @@ export const MatchFeed: React.FC<MatchFeedProps> = ({
               <span className="text-xs uppercase font-extrabold tracking-widest text-emerald-400">Live Matchmaker</span>
             </div>
             <h2 className="font-display font-extrabold text-2xl sm:text-3xl text-white mt-1">Available Local Matches</h2>
-            <p className="text-xs sm:text-sm text-slate-400 mt-1">Instant drop-in spots with verified players in Delhi, Noida & Greater Noida.</p>
+            <p className="text-xs sm:text-sm text-slate-400 mt-1">
+              Live games hosted by real athletes in Delhi, Noida & Greater Noida.
+            </p>
           </div>
 
           <div className="flex-1 max-w-md">
@@ -87,24 +89,30 @@ export const MatchFeed: React.FC<MatchFeedProps> = ({
             ))}
           </div>
 
-          <div className="text-xs font-bold text-slate-400 bg-slate-800/80 px-3 py-1.5 rounded-full border border-white/5">
-            {filteredMatches.length} Matches Found
+          <div className="text-xs font-bold text-slate-300 bg-slate-800/80 px-3.5 py-1.5 rounded-full border border-white/10">
+            {filteredMatches.length} {filteredMatches.length === 1 ? 'Live Match' : 'Live Matches'}
           </div>
         </div>
       </div>
 
+      {/* Empty State when 0 matches in Firestore */}
       {filteredMatches.length === 0 ? (
-        <div className="text-center py-16 px-4 glass-card rounded-2xl border border-white/5">
-          <div className="text-5xl mb-4">??</div>
-          <h3 className="text-xl font-bold text-white mb-2">No Matches Found in this Filter</h3>
-          <p className="text-slate-400 text-sm max-w-md mx-auto mb-6">
-            Try switching sport tabs or clearing your search. Or be the hero and host a match in your neighborhood!
+        <div className="text-center py-16 px-6 glass-card rounded-3xl border border-white/10 max-w-2xl mx-auto shadow-2xl">
+          <div className="w-16 h-16 mx-auto rounded-full bg-orange-500/20 border border-orange-500/40 flex items-center justify-center text-orange-400 mb-4 shadow-lg">
+            <Sparkles className="w-8 h-8" />
+          </div>
+          <h3 className="font-display font-extrabold text-2xl text-white mb-2">
+            No active matches right now. Be the first to host!
+          </h3>
+          <p className="text-slate-400 text-xs sm:text-sm max-w-md mx-auto mb-6 leading-relaxed">
+            Create a match lobby in under 30 seconds. Other players in your neighborhood will see it and claim their slots live.
           </p>
           <button 
             onClick={onOpenMatchmaker}
-            className="px-6 py-2.5 bg-gradient-to-r from-orange-500 to-amber-500 text-white font-bold rounded-xl shadow-lg glow-orange transition"
+            className="px-8 py-3.5 bg-gradient-to-r from-orange-500 to-amber-500 text-white font-extrabold text-xs uppercase tracking-wider rounded-2xl shadow-xl glow-orange hover:from-orange-600 transition flex items-center gap-2 mx-auto"
           >
-            Host a New Match
+            <PlusCircle className="w-4 h-4" />
+            <span>Host a Match Now</span>
           </button>
         </div>
       ) : (

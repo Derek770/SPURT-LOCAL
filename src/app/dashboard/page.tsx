@@ -16,43 +16,63 @@ export default function DashboardPage() {
   const [matches, setMatches] = useState<MatchItem[]>([]);
   const [currentSport, setCurrentSport] = useState<SportType>('all');
   const [isMatchmakerOpen, setIsMatchmakerOpen] = useState(false);
-  const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [toastMessage, setToastMessage] = useState<{ text: string; type: 'success' | 'info' | 'error' } | null>(null);
 
   useEffect(() => {
     const unsub = subscribeToMatches((items) => setMatches(items));
     return () => unsub();
   }, []);
 
-  const handleCreateMatch = async (matchData: any) => {
-    await createMatch(matchData);
-    setToastMessage(`?? New lobby created in Firestore & synced in real time!`);
+  const triggerToast = (text: string, type: 'success' | 'info' | 'error' = 'info') => {
+    setToastMessage({ text, type });
     setTimeout(() => setToastMessage(null), 4000);
+  };
+
+  const handleCreateMatch = async (matchData: any) => {
+    try {
+      await createMatch(matchData);
+      triggerToast('?? New match lobby created in Firestore and published live!', 'success');
+    } catch (e: any) {
+      triggerToast(e.message || 'Failed to create match.', 'error');
+    }
   };
 
   const handleJoin = async (id: string) => {
     if (!userProfile) return;
-    await joinMatch(id, userProfile);
-    setToastMessage('?? Spot reserved! Squad details and directions sent.');
-    setTimeout(() => setToastMessage(null), 4000);
+    try {
+      await joinMatch(id, userProfile);
+      triggerToast('?? Spot reserved in match lineup!', 'success');
+    } catch (e: any) {
+      triggerToast(e.message || 'Failed to join match.', 'error');
+    }
   };
 
   const handleLeave = async (id: string) => {
     if (!userProfile) return;
-    await leaveMatch(id, userProfile);
-    setToastMessage('You left the lobby.');
-    setTimeout(() => setToastMessage(null), 3000);
+    try {
+      await leaveMatch(id, userProfile);
+      triggerToast('You left the match lobby.', 'info');
+    } catch (e: any) {
+      triggerToast(e.message || 'Failed to leave match.', 'error');
+    }
   };
 
-  const myJoinedMatches = matches.filter(m => userProfile && m.playerUids.includes(userProfile.uid));
+  const myJoinedMatches = matches.filter(
+    (m) => userProfile && Array.isArray(m.playerUids) && m.playerUids.includes(userProfile.uid)
+  );
 
   return (
     <AuthGuard>
       <main className="min-h-screen bg-[#070D18]">
         {/* Toast */}
         {toastMessage && (
-          <div className="fixed bottom-6 right-6 z-50 p-4 rounded-xl border border-cyan-500 bg-slate-900/95 backdrop-blur-lg shadow-2xl text-slate-100 text-xs sm:text-sm font-medium flex items-center gap-2 animate-bounce">
+          <div className={`fixed bottom-6 right-6 z-50 p-4 rounded-xl border backdrop-blur-lg shadow-2xl text-slate-100 text-xs sm:text-sm font-medium flex items-center gap-2.5 animate-bounce ${
+            toastMessage.type === 'success' ? 'bg-emerald-950/90 border-emerald-500 text-emerald-200' :
+            toastMessage.type === 'error' ? 'bg-red-950/90 border-red-500 text-red-200' :
+            'bg-slate-900/95 border-cyan-500 text-slate-200'
+          }`}>
             <Zap className="w-4 h-4 text-orange-400 shrink-0" />
-            <span>{toastMessage}</span>
+            <span>{toastMessage.text}</span>
           </div>
         )}
 
@@ -74,7 +94,7 @@ export default function DashboardPage() {
                     {userProfile?.displayName}
                   </h1>
                   <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 text-[10px] font-bold border border-emerald-500/30">
-                    Verified Player
+                    Verified Athlete
                   </span>
                 </div>
                 <p className="text-xs text-slate-400 flex items-center gap-1 mt-1">
@@ -82,7 +102,7 @@ export default function DashboardPage() {
                   <span>{userProfile?.preferredArea || 'Greater Noida'}</span>
                 </p>
                 <div className="text-[11px] text-slate-300 mt-1 font-medium">
-                  Player Rating: <span className="text-amber-400 font-bold">? {userProfile?.rating || 4.9}</span> ? Matches: <span className="text-cyan-400 font-bold">{userProfile?.matchesPlayed || 12}</span>
+                  Player Rating: <span className="text-amber-400 font-bold">? {userProfile?.rating || 5.0}</span> ? Confirmed Lineups: <span className="text-cyan-400 font-bold">{myJoinedMatches.length}</span>
                 </div>
               </div>
             </div>
@@ -101,7 +121,7 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* My Active Schedules (if any) */}
+        {/* My Active Schedules */}
         {myJoinedMatches.length > 0 && (
           <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4">
             <div className="glass-card rounded-2xl p-5 border border-emerald-500/30 bg-emerald-950/20">
@@ -110,7 +130,7 @@ export default function DashboardPage() {
                 <span>Your Confirmed Match Lineups ({myJoinedMatches.length})</span>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                {myJoinedMatches.map(m => (
+                {myJoinedMatches.map((m) => (
                   <div key={m.id} className="p-3 rounded-xl bg-slate-900/80 border border-white/10 flex items-center justify-between text-xs">
                     <div>
                       <div className="font-bold text-white truncate max-w-[200px]">{m.title}</div>

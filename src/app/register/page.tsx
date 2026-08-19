@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
-import { Zap, Lock, Mail, User, MapPin, ArrowRight } from 'lucide-react';
+import { Zap, Lock, Mail, User, ArrowRight, AlertCircle } from 'lucide-react';
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -27,17 +27,31 @@ export default function RegisterPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!displayName || !email || !password) {
-      setError('Please fill all required fields');
+    if (!displayName.trim() || !email.trim() || !password.trim()) {
+      setError('Please fill out all required fields.');
       return;
     }
+    if (password.length < 6) {
+      setError('Password must be at least 6 characters.');
+      return;
+    }
+    if (sports.length === 0) {
+      setError('Please select at least one sport.');
+      return;
+    }
+
     setLoading(true);
     setError('');
+
     try {
       await register(email, password, displayName, preferredArea, sports);
       router.push('/dashboard');
     } catch (err: any) {
-      setError(err.message || 'Failed to register');
+      if (err.message?.includes('email-already-in-use')) {
+        setError('An account with this email already exists. Please sign in.');
+      } else {
+        setError(err.message || 'Failed to create athlete account. Please try again.');
+      }
     } finally {
       setLoading(false);
     }
@@ -55,16 +69,17 @@ export default function RegisterPage() {
               <Zap className="w-5 h-5 fill-white text-white" />
             </div>
             <span className="font-display font-black text-xl text-white">
-              SPORT<span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-amber-300">MATCH</span>
+              SPURT<span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-amber-300">LOCAL</span>
             </span>
           </Link>
           <h2 className="font-display font-extrabold text-2xl text-white">Create Athlete Profile</h2>
-          <p className="text-xs text-slate-400 mt-1">Get matched with recreational games in Delhi-NCR.</p>
+          <p className="text-xs text-slate-400 mt-1">Get registered to join live match lobbies across Delhi-NCR.</p>
         </div>
 
         {error && (
-          <div className="mb-4 p-3 rounded-xl bg-red-500/10 border border-red-500/30 text-red-300 text-xs font-medium">
-            {error}
+          <div className="mb-5 p-3.5 rounded-xl bg-red-500/15 border border-red-500/30 text-red-300 text-xs font-medium flex items-start gap-2.5">
+            <AlertCircle className="w-4 h-4 text-red-400 shrink-0 mt-0.5" />
+            <span>{error}</span>
           </div>
         )}
 
@@ -77,7 +92,7 @@ export default function RegisterPage() {
                 required
                 value={displayName}
                 onChange={(e) => setDisplayName(e.target.value)}
-                placeholder="Rohan Verma"
+                placeholder="Rohan Sharma"
                 className="w-full px-4 py-3 pl-10 rounded-xl bg-slate-900/90 border border-white/15 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-orange-500 transition"
               />
               <User className="w-4 h-4 text-slate-400 absolute left-3.5 top-3.5" />
@@ -107,7 +122,7 @@ export default function RegisterPage() {
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="????????"
+                placeholder="Minimum 6 characters"
                 className="w-full px-4 py-3 pl-10 rounded-xl bg-slate-900/90 border border-white/15 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-orange-500 transition"
               />
               <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 top-3.5" />
@@ -144,11 +159,11 @@ export default function RegisterPage() {
                   className={`py-2 px-3 rounded-xl border text-xs font-semibold transition text-left flex items-center justify-between ${
                     sports.includes(s.id) 
                       ? 'border-emerald-500 bg-emerald-500/20 text-emerald-300' 
-                      : 'border-white/10 bg-slate-900/60 text-slate-400'
+                      : 'border-white/10 bg-slate-900/60 text-slate-400 hover:border-white/20'
                   }`}
                 >
                   <span>{s.label}</span>
-                  {sports.includes(s.id) && <span>?</span>}
+                  {sports.includes(s.id) && <span className="text-emerald-400 font-bold">?</span>}
                 </button>
               ))}
             </div>
@@ -159,12 +174,12 @@ export default function RegisterPage() {
             disabled={loading}
             className="w-full py-3.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-400 text-black font-black text-xs uppercase tracking-wider glow-emerald hover:brightness-110 transition flex items-center justify-center gap-2"
           >
-            {loading ? 'Creating Profile...' : 'Complete Registration & Play'}
+            {loading ? 'Creating Profile in Database...' : 'Register & Enter Platform'}
             <ArrowRight className="w-4 h-4" />
           </button>
         </form>
 
-        <div className="text-center mt-6 text-xs text-slate-400">
+        <div className="text-center mt-6 pt-4 border-t border-white/10 text-xs text-slate-400">
           Already have an account?{' '}
           <Link href="/login" className="text-orange-400 font-bold hover:underline">
             Sign In

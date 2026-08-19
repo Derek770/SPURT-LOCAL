@@ -4,34 +4,40 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
-import { Zap, Lock, Mail, ArrowRight } from 'lucide-react';
+import { Zap, Lock, Mail, ArrowRight, AlertCircle } from 'lucide-react';
 
 export default function LoginPage() {
   const router = useRouter();
   const { login } = useAuth();
-  const [email, setEmail] = useState('rohan@spurt.local');
-  const [password, setPassword] = useState('password123');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!email || !password) {
+      setError('Please enter your email and password.');
+      return;
+    }
+
     setLoading(true);
     setError('');
+
     try {
       await login(email, password);
       router.push('/dashboard');
     } catch (err: any) {
-      setError(err.message || 'Failed to sign in');
+      if (err.message?.includes('user-not-found') || err.message?.includes('invalid-credential')) {
+        setError('Invalid email or password. If you are new, please register first.');
+      } else if (err.message?.includes('Account not found')) {
+        setError('Account not found. Please register first.');
+      } else {
+        setError(err.message || 'Failed to sign in. Please check your credentials.');
+      }
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleDemoLogin = async () => {
-    setLoading(true);
-    await login('athlete@spurt.local', 'password123');
-    router.push('/dashboard');
   };
 
   return (
@@ -47,16 +53,17 @@ export default function LoginPage() {
               <Zap className="w-5 h-5 fill-white text-white" />
             </div>
             <span className="font-display font-black text-xl text-white">
-              SPORT<span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-amber-300">MATCH</span>
+              SPURT<span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-amber-300">LOCAL</span>
             </span>
           </Link>
-          <h2 className="font-display font-extrabold text-2xl text-white">Welcome Back, Athlete</h2>
-          <p className="text-xs text-slate-400 mt-1">Access your match passes, squad chats, and Elo rating.</p>
+          <h2 className="font-display font-extrabold text-2xl text-white">Welcome Back</h2>
+          <p className="text-xs text-slate-400 mt-1">Sign in to access your match passes and lineups.</p>
         </div>
 
         {error && (
-          <div className="mb-4 p-3 rounded-xl bg-red-500/10 border border-red-500/30 text-red-300 text-xs font-medium">
-            {error}
+          <div className="mb-5 p-3.5 rounded-xl bg-red-500/15 border border-red-500/30 text-red-300 text-xs font-medium flex items-start gap-2.5">
+            <AlertCircle className="w-4 h-4 text-red-400 shrink-0 mt-0.5" />
+            <span>{error}</span>
           </div>
         )}
 
@@ -69,7 +76,7 @@ export default function LoginPage() {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="rohan@example.com"
+                placeholder="athlete@example.com"
                 className="w-full px-4 py-3 pl-10 rounded-xl bg-slate-900/90 border border-white/15 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 transition"
               />
               <Mail className="w-4 h-4 text-slate-400 absolute left-3.5 top-3.5" />
@@ -96,24 +103,13 @@ export default function LoginPage() {
             disabled={loading}
             className="w-full py-3.5 rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 text-white font-extrabold text-xs uppercase tracking-wider glow-orange hover:from-orange-600 transition flex items-center justify-center gap-2"
           >
-            {loading ? 'Authenticating...' : 'Sign In to Spurt'}
+            {loading ? 'Verifying Account...' : 'Sign In to Spurt'}
             <ArrowRight className="w-4 h-4" />
           </button>
         </form>
 
-        {/* Quick Demo Access Button */}
-        <div className="mt-4 pt-4 border-t border-white/10 text-center">
-          <button 
-            type="button"
-            onClick={handleDemoLogin}
-            className="w-full py-2.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-200 border border-white/10 font-bold text-xs transition"
-          >
-            ? Instant 1-Click Demo Login
-          </button>
-        </div>
-
-        <div className="text-center mt-6 text-xs text-slate-400">
-          New to Spurt?{' '}
+        <div className="text-center mt-6 pt-4 border-t border-white/10 text-xs text-slate-400">
+          Don't have an account yet?{' '}
           <Link href="/register" className="text-orange-400 font-bold hover:underline">
             Register Athlete Account
           </Link>
