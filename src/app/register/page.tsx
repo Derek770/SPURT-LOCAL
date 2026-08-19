@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
-import { Zap, Lock, Mail, User, ArrowRight, AlertCircle, Eye, EyeOff, MapPin } from 'lucide-react';
+import { Zap, Lock, Mail, User, ArrowRight, AlertCircle, Eye, EyeOff, MapPin, ChevronRight } from 'lucide-react';
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -18,32 +18,40 @@ export default function RegisterPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  // Interactive Background Sports Switcher
+  // 4K Ultra-High Resolution Dynamic Sports Action Photography
   const [activeSportIndex, setActiveSportIndex] = useState(1);
   const sportsData = [
     {
       sport: 'Cricket',
       icon: '??',
-      quote: 'Join box turf battles and 20-over fixtures in your neighborhood.',
-      image: 'https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?w=1600&auto=format&fit=crop&q=85'
+      tagline: 'Box Turf & Leather Matches',
+      quote: 'Join 8v8 box cricket matches and T20 fixtures in your neighborhood.',
+      image: 'https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?w=1920&auto=format&fit=crop&q=90',
+      accentColor: 'from-amber-500 to-orange-500'
     },
     {
       sport: 'Football',
       icon: '?',
-      quote: '5v5 AstroTurf and weekend leagues under evening floodlights.',
-      image: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=1600&auto=format&fit=crop&q=85'
+      tagline: '5v5 AstroTurf & Weekend 11s',
+      quote: 'Floodlit night games, fast-paced 5s, and guaranteed zero ghosting.',
+      image: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=1920&auto=format&fit=crop&q=90',
+      accentColor: 'from-emerald-500 to-teal-400'
     },
     {
       sport: 'Badminton',
       icon: '??',
-      quote: 'Indoor wooden court ladders, mixed doubles, and singles matches.',
-      image: 'https://images.unsplash.com/photo-1626224583764-f87db24ac4ea?w=1600&auto=format&fit=crop&q=85'
+      tagline: 'Singles & Doubles Partners',
+      quote: 'Indoor wooden court ladders, mixed doubles, and quick slot locks.',
+      image: 'https://images.unsplash.com/photo-1626224583764-f87db24ac4ea?w=1920&auto=format&fit=crop&q=90',
+      accentColor: 'from-rose-500 to-pink-500'
     },
     {
       sport: 'Table Tennis',
       icon: '??',
-      quote: '1v1 ranked rallies, community clubs, and precision play.',
-      image: 'https://images.unsplash.com/photo-1609710228159-0fa9bd7c0827?w=1600&auto=format&fit=crop&q=85'
+      tagline: 'Ranked 1v1 Elo Duels',
+      quote: 'Topspin rallies, fast reaction duels, and local weekend tournaments.',
+      image: 'https://images.unsplash.com/photo-1609710228159-0fa9bd7c0827?w=1920&auto=format&fit=crop&q=90',
+      accentColor: 'from-cyan-500 to-blue-500'
     }
   ];
 
@@ -97,90 +105,94 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#070D18] flex items-stretch justify-center relative overflow-hidden">
+    <div className="min-h-screen bg-[#070D18] flex items-center justify-center relative overflow-hidden selection:bg-emerald-500 selection:text-white">
       
-      {/* Background Image Slides */}
-      <div className="absolute inset-0 z-0">
+      {/* 4K Cinematic Full-Bleed Background Photography Layer */}
+      <div className="absolute inset-0 z-0 overflow-hidden">
         {sportsData.map((s, idx) => (
           <div
             key={s.sport}
             className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
-              idx === activeSportIndex ? 'opacity-100 scale-100' : 'opacity-0 scale-105 pointer-events-none'
+              idx === activeSportIndex ? 'opacity-100' : 'opacity-0 pointer-events-none'
             }`}
           >
             <img 
               src={s.image} 
               alt={s.sport} 
-              className="w-full h-full object-cover transform duration-1000"
+              className="w-full h-full object-cover animate-kenburns"
             />
-            <div className="absolute inset-0 bg-gradient-to-r from-[#070D18]/95 via-[#070D18]/85 to-[#070D18]/70 lg:to-transparent"></div>
-            <div className="absolute inset-0 bg-gradient-to-t from-[#070D18] via-transparent to-[#070D18]/60"></div>
+            <div className="absolute inset-0 bg-gradient-to-r from-[#070D18]/95 via-[#070D18]/80 to-[#070D18]/40 lg:to-[#070D18]/25"></div>
+            <div className="absolute inset-0 bg-gradient-to-t from-[#070D18] via-transparent to-[#070D18]/80"></div>
           </div>
         ))}
       </div>
 
-      <div className="relative z-10 max-w-7xl w-full mx-auto grid grid-cols-1 lg:grid-cols-12 min-h-screen items-center p-4 sm:p-8 gap-8">
+      <div className="relative z-10 max-w-7xl w-full mx-auto grid grid-cols-1 lg:grid-cols-12 min-h-screen items-center p-4 sm:p-8 lg:p-12 gap-8 lg:gap-12">
         
-        {/* Left Side: Desktop Branding */}
-        <div className="hidden lg:flex lg:col-span-6 flex-col justify-between h-[600px] p-6 text-white">
+        {/* Left Column: Branding */}
+        <div className="hidden lg:flex lg:col-span-6 flex-col justify-between min-h-[580px] p-4 text-white">
           <div>
-            <Link href="/" className="inline-flex items-center gap-3 group">
-              <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-cyan-500 via-emerald-400 to-orange-500 flex items-center justify-center text-white font-black text-base shadow-xl group-hover:rotate-12 transition-transform">
-                <Zap className="w-6 h-6 fill-white text-white" />
+            <Link href="/" className="inline-flex items-center gap-3.5 group">
+              <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-cyan-500 via-emerald-400 to-orange-500 flex items-center justify-center text-white font-black text-lg shadow-2xl group-hover:rotate-12 transition-transform">
+                <Zap className="w-6 h-6 fill-white" />
               </div>
               <div className="flex flex-col">
-                <span className="font-display font-black text-2xl tracking-tight text-white leading-none">
-                  SPURT<span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-amber-300">LOCAL</span>
+                <span className="font-display font-black text-2xl xl:text-3xl tracking-tight text-white leading-none">
+                  SPURT<span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-300">LOCAL</span>
                 </span>
-                <span className="text-[10px] uppercase tracking-widest text-cyan-400 font-bold">Delhi-NCR Sports Network</span>
+                <span className="text-[10px] uppercase tracking-widest text-emerald-400 font-bold mt-0.5">
+                  Athlete Onboarding Hub
+                </span>
               </div>
             </Link>
 
             <div className="mt-12 space-y-4">
-              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-900/80 border border-emerald-500/40 text-emerald-300 text-xs font-semibold backdrop-blur-xl animate-float">
+              <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-slate-900/85 border border-emerald-500/30 text-emerald-300 text-xs font-semibold backdrop-blur-xl shadow-2xl animate-float">
                 <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
-                <span>Instant Player Matchmaking</span>
+                <span>Verified Matchmaking Network</span>
               </div>
 
-              <h1 className="font-display font-black text-4xl xl:text-5xl leading-tight uppercase max-w-lg drop-shadow-2xl">
+              <h1 className="font-display font-black text-4xl xl:text-5xl leading-[1.1] uppercase max-w-lg drop-shadow-2xl">
                 JOIN YOUR<br />
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-cyan-300 to-amber-400">
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-teal-300 to-cyan-400">
                   NEIGHBORHOOD SQUAD.
                 </span>
               </h1>
 
-              <p className="text-slate-300 text-sm max-w-md font-medium leading-relaxed drop-shadow">
+              <p className="text-slate-200 text-sm xl:text-base max-w-lg font-medium leading-relaxed drop-shadow-lg">
                 "{currentSport.quote}"
               </p>
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
-            {sportsData.map((s, idx) => (
-              <button
-                key={s.sport}
-                onClick={() => setActiveSportIndex(idx)}
-                className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
-                  idx === activeSportIndex
-                    ? 'bg-gradient-to-r from-emerald-500 to-teal-400 text-black shadow-lg glow-emerald scale-105'
-                    : 'glass-card text-slate-300 hover:text-white border border-white/10'
-                }`}
-              >
-                <span>{s.icon}</span>
-                <span>{s.sport}</span>
-              </button>
-            ))}
+          <div className="glass-panel p-3 rounded-2xl border border-white/10 max-w-xl backdrop-blur-xl">
+            <div className="grid grid-cols-4 gap-2">
+              {sportsData.map((s, idx) => (
+                <button
+                  key={s.sport}
+                  onClick={() => setActiveSportIndex(idx)}
+                  className={`py-2 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
+                    idx === activeSportIndex
+                      ? 'bg-gradient-to-r from-emerald-500 to-teal-400 text-black shadow-xl glow-emerald scale-105'
+                      : 'bg-slate-900/60 hover:bg-slate-800 text-slate-300 border border-white/5'
+                  }`}
+                >
+                  <span>{s.icon}</span>
+                  <span className="truncate">{s.sport}</span>
+                </button>
+              ))}
+            </div>
           </div>
         </div>
 
-        {/* Right Side: Register Form */}
+        {/* Right Column: Register Form */}
         <div className="lg:col-span-6 w-full max-w-lg mx-auto">
-          <div className="glass-card rounded-3xl border border-white/20 p-7 sm:p-9 shadow-2xl backdrop-blur-2xl relative overflow-hidden">
-            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-400"></div>
+          <div className="glass-card rounded-3xl border border-white/20 p-7 sm:p-9 shadow-2xl backdrop-blur-3xl relative overflow-hidden">
+            <div className={`absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r ${currentSport.accentColor}`}></div>
 
             <div className="text-center lg:text-left mb-6">
-              <h2 className="font-display font-extrabold text-2xl text-white">Create Athlete Profile</h2>
-              <p className="text-xs text-slate-400 mt-1">Join active lobbies across Delhi, Noida, & Greater Noida.</p>
+              <h2 className="font-display font-extrabold text-2xl sm:text-3xl text-white">Create Athlete Profile</h2>
+              <p className="text-xs text-slate-400 mt-1">Get verified to join live match lobbies across NCR.</p>
             </div>
 
             {error && (
@@ -273,7 +285,7 @@ export default function RegisterPage() {
                       className={`py-2 px-3 rounded-xl border text-xs font-semibold transition text-left flex items-center justify-between ${
                         sports.includes(s.id) 
                           ? 'border-emerald-500 bg-emerald-500/20 text-emerald-300' 
-                          : 'border-white/10 bg-slate-900/60 text-slate-400'
+                          : 'border-white/10 bg-slate-900/60 text-slate-400 hover:border-white/20'
                       }`}
                     >
                       <span>{s.label}</span>
@@ -286,17 +298,18 @@ export default function RegisterPage() {
               <button 
                 type="submit" 
                 disabled={loading}
-                className="w-full py-3.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-400 text-black font-black text-xs uppercase tracking-wider glow-emerald hover:brightness-110 transition flex items-center justify-center gap-2 shadow-lg mt-2"
+                className="w-full py-3.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-400 text-black font-black text-xs uppercase tracking-wider glow-emerald hover:brightness-110 active:scale-95 transition flex items-center justify-center gap-2 shadow-2xl animate-shimmer mt-2"
               >
-                {loading ? 'Creating Profile...' : 'Complete Profile & Play'}
+                {loading ? 'Creating Profile in Database...' : 'Complete Profile & Play'}
                 <ArrowRight className="w-4 h-4" />
               </button>
             </form>
 
             <div className="text-center mt-5 pt-3.5 border-t border-white/10 text-xs text-slate-400">
               Already have an account?{' '}
-              <Link href="/login" className="text-emerald-400 font-bold hover:underline">
-                Sign In ?
+              <Link href="/login" className="text-emerald-400 font-bold hover:underline inline-flex items-center gap-1">
+                <span>Sign In</span>
+                <ChevronRight className="w-3 h-3" />
               </Link>
             </div>
 
