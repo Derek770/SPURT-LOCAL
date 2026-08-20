@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Search, PlusCircle, Trophy, Sparkles } from 'lucide-react';
+import { Search, PlusCircle, Sparkles } from 'lucide-react';
 import { MatchItem, SportType, UserProfile } from '@/types';
 import { MatchCard } from './MatchCard';
 
@@ -35,12 +35,12 @@ export const MatchFeed: React.FC<MatchFeedProps> = ({
     return matchesSport && matchesSearch;
   });
 
-  const sportsTabs: { id: SportType; label: string; icon: string }[] = [
-    { id: 'all', label: 'All Sports', icon: '?' },
-    { id: 'cricket', label: 'Cricket', icon: '??' },
-    { id: 'football', label: 'Football', icon: '?' },
-    { id: 'badminton', label: 'Badminton', icon: '??' },
-    { id: 'table_tennis', label: 'Table Tennis', icon: '??' },
+  const sportsTabs: { id: SportType; label: string }[] = [
+    { id: 'all', label: 'All Sports' },
+    { id: 'cricket', label: 'Cricket' },
+    { id: 'football', label: 'Football' },
+    { id: 'badminton', label: 'Badminton' },
+    { id: 'table_tennis', label: 'Table Tennis' },
   ];
 
   return (
@@ -54,7 +54,7 @@ export const MatchFeed: React.FC<MatchFeedProps> = ({
             </div>
             <h2 className="font-display font-extrabold text-2xl sm:text-3xl text-white mt-1">Available Local Matches</h2>
             <p className="text-xs sm:text-sm text-slate-400 mt-1">
-              Live games hosted by real athletes in Delhi, Noida & Greater Noida.
+              Live games hosted by verified athletes in Delhi, Noida & Greater Noida.
             </p>
           </div>
 
@@ -84,7 +84,7 @@ export const MatchFeed: React.FC<MatchFeedProps> = ({
                     : 'font-medium bg-slate-800/80 text-slate-300 hover:bg-slate-700 hover:text-white border border-white/5'
                 }`}
               >
-                <span>{tab.icon}</span> {tab.label}
+                {tab.label}
               </button>
             ))}
           </div>

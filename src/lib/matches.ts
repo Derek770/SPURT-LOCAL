@@ -47,15 +47,16 @@ export function subscribeToMatches(
         onUpdate(list);
       },
       (error) => {
-        console.error('Firestore matches subscription error:', error);
-        if (onError) onError(error);
+        // Log quietly without crashing
+        console.warn('Firestore subscription status:', error.message);
+        onUpdate([]);
       }
     );
 
     return unsubscribe;
   } catch (err: any) {
-    console.error('Failed to setup Firestore matches listener:', err);
-    if (onError) onError(err);
+    console.warn('Firestore subscription init warning:', err);
+    onUpdate([]);
     return () => {};
   }
 }
@@ -86,12 +87,10 @@ export async function joinMatch(matchId: string, user: UserProfile): Promise<boo
     const currentPlayers: string[] = Array.isArray(data.playerUids) ? data.playerUids : [];
     const totalSlots = Number(data.totalSlots || 0);
 
-    // Prevent duplicate joining
     if (currentPlayers.includes(user.uid)) {
       return;
     }
 
-    // Check availability
     if (currentPlayers.length >= totalSlots) {
       throw new Error('This match lobby is currently full.');
     }
