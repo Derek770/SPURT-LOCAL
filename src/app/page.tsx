@@ -7,6 +7,8 @@ import { MatchFeed } from '@/components/MatchFeed';
 import { SportCards } from '@/components/SportCards';
 import { MatchmakerModal } from '@/components/MatchmakerModal';
 import { SquadChatModal } from '@/components/SquadChatModal';
+import { WarmUpArenaModal } from '@/components/WarmUpArenaModal';
+import { WarmUpFAB } from '@/components/WarmUpFAB';
 import { useAuth } from '@/context/AuthContext';
 import { MatchItem, SportType } from '@/types';
 import { subscribeToMatches, createMatch, joinMatch, leaveMatch } from '@/lib/matches';
@@ -18,6 +20,7 @@ export default function Home() {
   const [selectedSport, setSelectedSport] = useState<SportType>('all');
   const [isMatchmakerOpen, setIsMatchmakerOpen] = useState(false);
   const [selectedChatMatch, setSelectedChatMatch] = useState<MatchItem | null>(null);
+  const [isWarmUpOpen, setIsWarmUpOpen] = useState(false);
   const [selectedLocation, setSelectedLocation] = useState('Greater Noida');
 
   useEffect(() => {
@@ -90,6 +93,7 @@ export default function Home() {
       {/* Navbar */}
       <Navbar 
         onOpenMatchmaker={handleOpenMatchmaker}
+        onOpenWarmUp={() => setIsWarmUpOpen(true)}
         selectedLocation={selectedLocation}
         onSelectLocation={setSelectedLocation}
       />
@@ -189,6 +193,16 @@ export default function Home() {
         currentUser={userProfile}
         onClose={() => setSelectedChatMatch(null)}
       />
+
+      {/* Warm-Up Arena Modal */}
+      <WarmUpArenaModal
+        isOpen={isWarmUpOpen}
+        onClose={() => setIsWarmUpOpen(false)}
+        currentUser={userProfile}
+      />
+
+      {/* Floating Warm-Up Action Button */}
+      <WarmUpFAB onOpen={() => setIsWarmUpOpen(true)} />
 
     </div>
   );

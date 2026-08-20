@@ -8,6 +8,8 @@ import { Navbar } from '@/components/Navbar';
 import { MatchCard } from '@/components/MatchCard';
 import { MatchmakerModal } from '@/components/MatchmakerModal';
 import { SquadChatModal } from '@/components/SquadChatModal';
+import { WarmUpArenaModal } from '@/components/WarmUpArenaModal';
+import { WarmUpFAB } from '@/components/WarmUpFAB';
 import { MatchItem, SportType } from '@/types';
 import { subscribeToMatches, createMatch, joinMatch, leaveMatch } from '@/lib/matches';
 import { User, Trophy, Shield, Calendar, MapPin, Zap, LogOut, PlusCircle, Sparkles, MessageSquare } from 'lucide-react';
@@ -19,6 +21,7 @@ export default function DashboardPage() {
   const [activeTab, setActiveTab] = useState<'joined' | 'hosted' | 'all'>('joined');
   const [isMatchmakerOpen, setIsMatchmakerOpen] = useState(false);
   const [selectedChatMatch, setSelectedChatMatch] = useState<MatchItem | null>(null);
+  const [isWarmUpOpen, setIsWarmUpOpen] = useState(false);
 
   useEffect(() => {
     if (!loading && !userProfile) {
@@ -79,7 +82,7 @@ export default function DashboardPage() {
   return (
     <div className="min-h-screen bg-[#070D18] text-slate-100 selection:bg-orange-500 selection:text-white pb-20">
       
-      <Navbar onOpenMatchmaker={() => setIsMatchmakerOpen(true)} />
+      <Navbar onOpenMatchmaker={() => setIsMatchmakerOpen(true)} onOpenWarmUp={() => setIsWarmUpOpen(true)} />
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
         
@@ -111,6 +114,16 @@ export default function DashboardPage() {
                       {s.replace('_', ' ')}
                     </span>
                   ))}
+                  {userProfile.bestReflexMs && (
+                    <span className="text-[10px] font-extrabold px-2.5 py-0.5 rounded-lg bg-orange-500/20 text-orange-300 border border-orange-500/30 flex items-center gap-1">
+                      <span>⚡</span> Reflex: {userProfile.bestReflexMs}ms
+                    </span>
+                  )}
+                  {userProfile.bestKeepieUppie !== undefined && userProfile.bestKeepieUppie > 0 && (
+                    <span className="text-[10px] font-extrabold px-2.5 py-0.5 rounded-lg bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 flex items-center gap-1">
+                      <span>⚽</span> Juggles: {userProfile.bestKeepieUppie}
+                    </span>
+                  )}
                 </div>
               </div>
             </div>
@@ -222,6 +235,16 @@ export default function DashboardPage() {
         currentUser={userProfile}
         onClose={() => setSelectedChatMatch(null)}
       />
+
+      {/* Warm-Up Arena Modal */}
+      <WarmUpArenaModal
+        isOpen={isWarmUpOpen}
+        onClose={() => setIsWarmUpOpen(false)}
+        currentUser={userProfile}
+      />
+
+      {/* Floating Warm-Up Action Button */}
+      <WarmUpFAB onOpen={() => setIsWarmUpOpen(true)} />
 
     </div>
   );

@@ -9,12 +9,14 @@ import { SpurtLogo } from './SpurtLogo';
 
 interface NavbarProps {
   onOpenMatchmaker?: () => void;
+  onOpenWarmUp?: () => void;
   selectedLocation?: string;
   onSelectLocation?: (loc: string) => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
   onOpenMatchmaker,
+  onOpenWarmUp,
   selectedLocation = 'Greater Noida',
   onSelectLocation
 }) => {
@@ -46,7 +48,15 @@ export const Navbar: React.FC<NavbarProps> = ({
           </Link>
           <a href="/#sports-grid-section" className="hover:text-white transition-colors">Sports</a>
           <a href="/#how-it-works" className="hover:text-white transition-colors">How It Works</a>
-          <a href="/#community" className="hover:text-white transition-colors">Community</a>
+          {onOpenWarmUp && (
+            <button
+              onClick={onOpenWarmUp}
+              className="text-orange-400 hover:text-orange-300 font-bold transition flex items-center gap-1"
+            >
+              <span>🔥</span>
+              <span>Warm-Up</span>
+            </button>
+          )}
         </div>
 
         {/* Action Controls */}

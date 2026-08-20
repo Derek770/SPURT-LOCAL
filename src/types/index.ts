@@ -9,6 +9,8 @@ export interface UserProfile {
   preferredSports?: string[];
   rating?: number;
   matchesPlayed?: number;
+  bestReflexMs?: number;
+  bestKeepieUppie?: number;
   createdAt?: string;
 }
 
