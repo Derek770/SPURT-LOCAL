@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { Zap, Lock, Mail, ArrowRight, AlertCircle, Eye, EyeOff, MapPin, Trophy, ShieldCheck, Activity, Target, ChevronRight } from 'lucide-react';
+import { SpurtLogo } from '@/components/SpurtLogo';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -123,18 +124,8 @@ export default function LoginPage() {
         <div className="w-full md:w-1/2 flex flex-col justify-center text-white py-6">
           
           {/* Brand Header */}
-          <Link href="/" className="inline-flex items-center gap-3 mb-6 group w-fit">
-            <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-cyan-500 via-emerald-400 to-orange-500 flex items-center justify-center text-white font-black text-lg shadow-2xl group-hover:rotate-12 transition-transform">
-              <Zap className="w-6 h-6 fill-white" />
-            </div>
-            <div className="flex flex-col">
-              <span className="font-display font-black text-2xl sm:text-3xl tracking-tight text-white leading-none">
-                SPURT<span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-amber-300">LOCAL</span>
-              </span>
-              <span className="text-[10px] uppercase tracking-widest text-cyan-400 font-bold mt-0.5">
-                Delhi ? Greater Noida ? NCR
-              </span>
-            </div>
+          <Link href="/" className="inline-flex items-center mb-6 w-fit">
+            <SpurtLogo size="lg" />
           </Link>
 
           {/* Location Badge */}

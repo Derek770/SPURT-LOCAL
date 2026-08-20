@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { Zap, Plus, LogOut, ChevronDown, MapPin, User, LogIn, UserPlus } from 'lucide-react';
+import { SpurtLogo } from './SpurtLogo';
 
 interface NavbarProps {
   onOpenMatchmaker?: () => void;
@@ -33,16 +34,8 @@ export const Navbar: React.FC<NavbarProps> = ({
       <nav className="glass-nav rounded-full px-4 sm:px-6 py-3 flex items-center justify-between shadow-2xl border border-white/10">
         
         {/* Brand Logo */}
-        <Link href="/" className="flex items-center gap-2.5 group">
-          <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-cyan-500 via-emerald-400 to-orange-500 flex items-center justify-center text-white font-black text-sm shadow-md group-hover:rotate-12 transition-transform">
-            <Zap className="w-4 h-4 fill-white text-white" />
-          </div>
-          <div className="flex flex-col">
-            <span className="font-display font-black text-base sm:text-lg tracking-tight text-white leading-none">
-              SPURT<span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-amber-300">LOCAL</span>
-            </span>
-            <span className="text-[9px] uppercase tracking-widest text-cyan-400 font-bold">Delhi-NCR</span>
-          </div>
+        <Link href="/" className="flex items-center">
+          <SpurtLogo size="sm" />
         </Link>
 
         {/* Navigation Links */}

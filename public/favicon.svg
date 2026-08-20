@@ -1,0 +1,25 @@
+<svg width="64" height="64" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stopColor="#0B132B" />
+      <stop offset="100%" stopColor="#070D18" />
+    </linearGradient>
+    <linearGradient id="boltGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stopColor="#FF9100" />
+      <stop offset="50%" stopColor="#FF5E1E" />
+      <stop offset="100%" stopColor="#00F0FF" />
+    </linearGradient>
+  </defs>
+
+  <!-- Background Pill -->
+  <rect width="100" height="100" rx="28" fill="url(#bgGrad)" stroke="#FF5E1E" stroke-width="4" />
+  
+  <!-- Outer Energy Trail -->
+  <path d="M22 30 L55 14 L78 28 L45 44 Z" fill="#00F0FF" opacity="0.8" />
+  
+  <!-- Main Lightning S -->
+  <path d="M74 22 L32 54 L52 54 L24 88 L68 46 L48 46 Z" fill="url(#boltGrad)" />
+  
+  <!-- Star Accent -->
+  <circle cx="80" cy="74" r="5" fill="#00F0FF" />
+</svg>
