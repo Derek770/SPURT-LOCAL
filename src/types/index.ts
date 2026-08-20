@@ -36,3 +36,13 @@ export interface MatchItem {
   playerUids: string[];
   createdAt?: string | number;
 }
+
+export interface ChatMessage {
+  id: string;
+  matchId: string;
+  senderUid: string;
+  senderName: string;
+  senderPhoto?: string;
+  text: string;
+  createdAt?: any;
+}

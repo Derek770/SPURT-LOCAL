@@ -13,6 +13,7 @@ interface MatchFeedProps {
   onJoinMatch: (matchId: string) => void;
   onLeaveMatch: (matchId: string) => void;
   onOpenMatchmaker: () => void;
+  onOpenChat?: (match: MatchItem) => void;
 }
 
 export const MatchFeed: React.FC<MatchFeedProps> = ({
@@ -22,7 +23,8 @@ export const MatchFeed: React.FC<MatchFeedProps> = ({
   currentUser,
   onJoinMatch,
   onLeaveMatch,
-  onOpenMatchmaker
+  onOpenMatchmaker,
+  onOpenChat
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -123,7 +125,8 @@ export const MatchFeed: React.FC<MatchFeedProps> = ({
               match={match} 
               currentUser={currentUser} 
               onJoin={onJoinMatch} 
-              onLeave={onLeaveMatch} 
+              onLeave={onLeaveMatch}
+              onOpenChat={onOpenChat}
             />
           ))}
         </div>

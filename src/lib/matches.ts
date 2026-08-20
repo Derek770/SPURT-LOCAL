@@ -9,22 +9,21 @@ import {
   updateDoc
 } from 'firebase/firestore';
 import { db } from './firebase';
-import { MatchItem, UserProfile } from '@/types';
+import { MatchItem, UserProfile, ChatMessage } from '@/types';
 
-// 100% Pure Real User Lobbies (Zero Bots, Zero Fake Data)
+// Real-Time Match List Subscriptions
 let realMatchesStore: MatchItem[] = [];
-const listeners: ((matches: MatchItem[]) => void)[] = [];
+const matchListeners: ((matches: MatchItem[]) => void)[] = [];
 
-function notifyListeners() {
-  listeners.forEach((l) => l([...realMatchesStore]));
+function notifyMatchListeners() {
+  matchListeners.forEach((l) => l([...realMatchesStore]));
 }
 
-// Subscribe strictly to real matches
 export function subscribeToMatches(
   onUpdate: (matches: MatchItem[]) => void,
   onError?: (error: Error) => void
 ): () => void {
-  listeners.push(onUpdate);
+  matchListeners.push(onUpdate);
   onUpdate([...realMatchesStore]);
 
   try {
@@ -57,23 +56,23 @@ export function subscribeToMatches(
         });
 
         realMatchesStore = firestoreList;
-        notifyListeners();
+        notifyMatchListeners();
       },
       (err) => {
-        console.warn('Firestore subscription status:', err.message);
+        console.warn('Firestore subscription notice:', err.message);
         onUpdate([...realMatchesStore]);
       }
     );
 
     return () => {
-      const idx = listeners.indexOf(onUpdate);
-      if (idx !== -1) listeners.splice(idx, 1);
+      const idx = matchListeners.indexOf(onUpdate);
+      if (idx !== -1) matchListeners.splice(idx, 1);
       unsubscribe();
     };
   } catch (err) {
     return () => {
-      const idx = listeners.indexOf(onUpdate);
-      if (idx !== -1) listeners.splice(idx, 1);
+      const idx = matchListeners.indexOf(onUpdate);
+      if (idx !== -1) matchListeners.splice(idx, 1);
     };
   }
 }
@@ -89,9 +88,8 @@ export async function createMatch(
     createdAt: new Date().toISOString()
   };
 
-  // Add real match immediately
   realMatchesStore = [matchItem, ...realMatchesStore];
-  notifyListeners();
+  notifyMatchListeners();
 
   try {
     const docRef = await addDoc(collection(db, 'matches'), {
@@ -106,16 +104,12 @@ export async function createMatch(
   }
 }
 
-// Join a real match
+// Join match
 export async function joinMatch(matchId: string, user: UserProfile): Promise<boolean> {
   const match = realMatchesStore.find((m) => m.id === matchId);
-  if (!match) {
-    throw new Error('Match lobby not found.');
-  }
+  if (!match) return false;
 
-  if (match.playerUids.includes(user.uid)) {
-    return true;
-  }
+  if (match.playerUids.includes(user.uid)) return true;
 
   if (match.availableSlots <= 0 || match.filledSlots >= match.totalSlots) {
     throw new Error('This match lobby is currently full.');
@@ -124,7 +118,7 @@ export async function joinMatch(matchId: string, user: UserProfile): Promise<boo
   const newPlayers = [...match.playerUids, user.uid];
   const newFilled = newPlayers.length;
   const newAvailable = Math.max(0, match.totalSlots - newFilled);
-  const newBadge = newAvailable === 0 ? '?? Lobby Full' : (newAvailable === 1 ? '? 1 Slot Left' : `?? ${newAvailable} Slots Left`);
+  const newBadge = newAvailable === 0 ? 'Lobby Full' : `${newAvailable} Slots Left`;
 
   match.playerUids = newPlayers;
   match.filledSlots = newFilled;
@@ -132,7 +126,7 @@ export async function joinMatch(matchId: string, user: UserProfile): Promise<boo
   match.badge = newBadge;
 
   realMatchesStore = [...realMatchesStore];
-  notifyListeners();
+  notifyMatchListeners();
 
   try {
     const matchRef = doc(db, 'matches', matchId);
@@ -149,17 +143,15 @@ export async function joinMatch(matchId: string, user: UserProfile): Promise<boo
   return true;
 }
 
-// Leave a real match
+// Leave match
 export async function leaveMatch(matchId: string, user: UserProfile): Promise<boolean> {
   const match = realMatchesStore.find((m) => m.id === matchId);
-  if (!match || !match.playerUids.includes(user.uid)) {
-    return true;
-  }
+  if (!match || !match.playerUids.includes(user.uid)) return true;
 
   const newPlayers = match.playerUids.filter((id) => id !== user.uid);
   const newFilled = newPlayers.length;
   const newAvailable = Math.max(0, match.totalSlots - newFilled);
-  const newBadge = newAvailable === 0 ? '?? Lobby Full' : `? ${newAvailable} Slots Left`;
+  const newBadge = newAvailable === 0 ? 'Lobby Full' : `${newAvailable} Slots Left`;
 
   match.playerUids = newPlayers;
   match.filledSlots = newFilled;
@@ -167,7 +159,7 @@ export async function leaveMatch(matchId: string, user: UserProfile): Promise<bo
   match.badge = newBadge;
 
   realMatchesStore = [...realMatchesStore];
-  notifyListeners();
+  notifyMatchListeners();
 
   try {
     const matchRef = doc(db, 'matches', matchId);
@@ -182,4 +174,64 @@ export async function leaveMatch(matchId: string, user: UserProfile): Promise<bo
   }
 
   return true;
+}
+
+// ==========================================
+// REAL-TIME SQUAD CHAT ROOM SYSTEM
+// ==========================================
+
+export function subscribeToMatchChat(
+  matchId: string,
+  onUpdate: (messages: ChatMessage[]) => void
+): () => void {
+  try {
+    const chatRef = collection(db, 'matches', matchId, 'messages');
+    const q = query(chatRef, orderBy('createdAt', 'asc'));
+
+    const unsubscribe = onSnapshot(
+      q,
+      (snapshot) => {
+        const msgs: ChatMessage[] = snapshot.docs.map((docSnap) => {
+          const data = docSnap.data();
+          return {
+            id: docSnap.id,
+            matchId: data.matchId || matchId,
+            senderUid: data.senderUid || '',
+            senderName: data.senderName || 'Athlete',
+            senderPhoto: data.senderPhoto || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100',
+            text: data.text || '',
+            createdAt: data.createdAt
+          };
+        });
+        onUpdate(msgs);
+      },
+      (err) => {
+        console.warn('Chat subscription note:', err.message);
+        onUpdate([]);
+      }
+    );
+
+    return unsubscribe;
+  } catch (err) {
+    onUpdate([]);
+    return () => {};
+  }
+}
+
+export async function sendChatMessage(
+  matchId: string,
+  user: UserProfile,
+  text: string
+): Promise<void> {
+  if (!text.trim()) return;
+
+  const chatRef = collection(db, 'matches', matchId, 'messages');
+  await addDoc(chatRef, {
+    matchId,
+    senderUid: user.uid,
+    senderName: user.displayName || 'Athlete',
+    senderPhoto: user.photoURL || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100',
+    text: text.trim(),
+    createdAt: serverTimestamp()
+  });
 }

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { X, ArrowRight, ArrowLeft, Zap, Trophy, ShieldCheck, Check } from 'lucide-react';
+import { X, ArrowRight, ArrowLeft, Zap, Trophy, ShieldCheck, Check, Users, Plus, Minus } from 'lucide-react';
 import { SportType, UserProfile } from '@/types';
 
 interface MatchmakerModalProps {
@@ -25,6 +25,20 @@ export const MatchmakerModal: React.FC<MatchmakerModalProps> = ({
   const [skill, setSkill] = useState('Casual / Recreational');
   const [location, setLocation] = useState('Greater Noida (Pari Chowk & KP3)');
   const [time, setTime] = useState('Tonight (8:00 PM - 10:00 PM)');
+  const [totalPlayers, setTotalPlayers] = useState<number>(16);
+
+  const sportCapacityPresets: Record<string, number[]> = {
+    cricket: [12, 16, 22],
+    football: [10, 14, 22],
+    badminton: [2, 4, 6],
+    table_tennis: [2, 4]
+  };
+
+  const handleSportChange = (s: SportType) => {
+    setSport(s);
+    const defaultCapacity = s === 'cricket' ? 16 : s === 'football' ? 10 : s === 'badminton' ? 4 : 2;
+    setTotalPlayers(defaultCapacity);
+  };
 
   if (!isOpen) return null;
 
@@ -32,8 +46,7 @@ export const MatchmakerModal: React.FC<MatchmakerModalProps> = ({
     if (step < 3) {
       setStep(step + 1);
     } else {
-      // Submit
-      const totalSlots = sport === 'table_tennis' ? 2 : sport === 'badminton' ? 4 : 10;
+      const totalSlots = Math.max(2, totalPlayers);
       const filledSlots = 1;
       const availableSlots = totalSlots - filledSlots;
 
@@ -100,7 +113,7 @@ export const MatchmakerModal: React.FC<MatchmakerModalProps> = ({
               ].map((s) => (
                 <div 
                   key={s.id}
-                  onClick={() => setSport(s.id as SportType)}
+                  onClick={() => handleSportChange(s.id as SportType)}
                   className={`cursor-pointer p-4 rounded-2xl border text-center transition ${
                     sport === s.id 
                       ? 'border-orange-500 bg-orange-500/20 shadow-lg' 
@@ -117,26 +130,85 @@ export const MatchmakerModal: React.FC<MatchmakerModalProps> = ({
               onClick={handleNext} 
               className="w-full py-3.5 rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 text-white font-extrabold text-xs uppercase tracking-wider glow-orange transition flex items-center justify-center gap-2"
             >
-              <span>Continue to Skill & Format</span>
+              <span>Continue to Team Size & Format</span>
               <ArrowRight className="w-4 h-4" />
             </button>
           </div>
         )}
 
-        {/* Step 2: Format & Skill */}
+        {/* Step 2: Custom Team Size & Format */}
         {step === 2 && (
           <div>
-            <h3 className="font-display font-extrabold text-xl text-white mb-1">Format & Skill Rating</h3>
-            <p className="text-xs text-slate-400 mb-4">We match you with players of similar intensity.</p>
+            <h3 className="font-display font-extrabold text-xl text-white mb-1">Team Size & Skill Level</h3>
+            <p className="text-xs text-slate-400 mb-4">Specify how many players you need in this lobby.</p>
 
             <div className="space-y-4 mb-6">
+              {/* Custom Players Counter */}
+              <div className="p-4 rounded-2xl bg-slate-900/90 border border-white/15">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-xs font-bold text-slate-200 uppercase tracking-wider flex items-center gap-1.5">
+                    <Users className="w-4 h-4 text-orange-400" />
+                    <span>Total Players Needed</span>
+                  </span>
+                  <span className="text-xs font-black text-orange-400 bg-orange-500/20 px-2.5 py-0.5 rounded-full border border-orange-500/30">
+                    {totalPlayers} Total Athletes
+                  </span>
+                </div>
+
+                <div className="flex items-center justify-between gap-3 mt-3">
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setTotalPlayers((prev) => Math.max(2, prev - 1))}
+                      className="w-10 h-10 rounded-xl bg-slate-800 hover:bg-slate-700 border border-white/15 flex items-center justify-center text-white active:scale-95 transition"
+                    >
+                      <Minus className="w-4 h-4" />
+                    </button>
+                    <input
+                      type="number"
+                      min="2"
+                      max="32"
+                      value={totalPlayers}
+                      onChange={(e) => setTotalPlayers(Math.max(2, parseInt(e.target.value) || 2))}
+                      className="w-16 h-10 text-center rounded-xl bg-slate-950 border border-orange-500 text-white font-black text-lg focus:outline-none"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setTotalPlayers((prev) => Math.min(32, prev + 1))}
+                      className="w-10 h-10 rounded-xl bg-slate-800 hover:bg-slate-700 border border-white/15 flex items-center justify-center text-white active:scale-95 transition"
+                    >
+                      <Plus className="w-4 h-4" />
+                    </button>
+                  </div>
+
+                  {/* Preset chips */}
+                  <div className="flex flex-wrap gap-1.5">
+                    {(sportCapacityPresets[sport] || [4, 10, 16]).map((num) => (
+                      <button
+                        type="button"
+                        key={num}
+                        onClick={() => setTotalPlayers(num)}
+                        className={`px-3 py-1.5 rounded-xl text-xs font-bold transition ${
+                          totalPlayers === num
+                            ? 'bg-orange-500 text-white shadow-md'
+                            : 'bg-slate-800/80 text-slate-400 hover:text-white border border-white/10'
+                        }`}
+                      >
+                        {num} Players
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Format */}
               <div>
-                <label className="text-xs font-bold text-slate-300 uppercase tracking-wider block mb-2">Match Format</label>
+                <label className="text-xs font-bold text-slate-300 uppercase tracking-wider block mb-1.5">Match Format</label>
                 <div className="grid grid-cols-2 gap-2">
                   {['Casual Turf Friendly', 'Ranked Competitive'].map((f) => (
                     <label 
                       key={f} 
-                      className={`flex items-center gap-2 p-3 rounded-xl border cursor-pointer text-xs transition ${
+                      className={`flex items-center gap-2 p-2.5 rounded-xl border cursor-pointer text-xs transition ${
                         format === f ? 'border-orange-500 bg-orange-500/10 text-white' : 'border-white/10 bg-slate-800/60 text-slate-300'
                       }`}
                     >
@@ -153,37 +225,18 @@ export const MatchmakerModal: React.FC<MatchmakerModalProps> = ({
                 </div>
               </div>
 
+              {/* Skill */}
               <div>
-                <label className="text-xs font-bold text-slate-300 uppercase tracking-wider block mb-2">Skill Tier</label>
-                <div className="space-y-2">
-                  {[
-                    { label: 'Casual / Recreational', sub: 'Play for fun, fitness, and friendly rallies', badge: 'Recreational' },
-                    { label: 'Intermediate', sub: 'Regular player with solid fundamentals & pace', badge: 'Intermediate' },
-                    { label: 'Competitive / Advanced', sub: 'High-intensity, tactical, and fast-paced fixtures', badge: 'Advanced' },
-                  ].map((sk) => (
-                    <label 
-                      key={sk.label}
-                      className={`flex items-center justify-between p-3 rounded-xl border cursor-pointer text-xs transition ${
-                        skill === sk.label ? 'border-orange-500 bg-orange-500/10 text-white' : 'border-white/10 bg-slate-800/60 text-slate-300'
-                      }`}
-                    >
-                      <div className="flex items-center gap-2.5">
-                        <input 
-                          type="radio" 
-                          name="modal-skill" 
-                          checked={skill === sk.label} 
-                          onChange={() => setSkill(sk.label)}
-                          className="text-orange-500" 
-                        />
-                        <div>
-                          <div className="font-bold text-white">{sk.label}</div>
-                          <div className="text-[10px] text-slate-400">{sk.sub}</div>
-                        </div>
-                      </div>
-                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-slate-800 border border-white/10 text-orange-300 font-semibold">{sk.badge}</span>
-                    </label>
-                  ))}
-                </div>
+                <label className="text-xs font-bold text-slate-300 uppercase tracking-wider block mb-1.5">Skill Level</label>
+                <select
+                  value={skill}
+                  onChange={(e) => setSkill(e.target.value)}
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-white/15 text-xs text-white focus:outline-none focus:border-orange-500"
+                >
+                  <option value="Casual / Recreational">Casual / Recreational (All Welcome)</option>
+                  <option value="Intermediate">Intermediate (Regular Players)</option>
+                  <option value="Competitive / Advanced">Competitive / Advanced (Fast Pace)</option>
+                </select>
               </div>
             </div>
 
@@ -210,11 +263,11 @@ export const MatchmakerModal: React.FC<MatchmakerModalProps> = ({
         {step === 3 && (
           <div>
             <h3 className="font-display font-extrabold text-xl text-white mb-1">Select Venue & Time Slot</h3>
-            <p className="text-xs text-slate-400 mb-4">Choose preferred hub for this match fixture.</p>
+            <p className="text-xs text-slate-400 mb-4">Choose preferred hub for this {totalPlayers}-player match.</p>
 
             <div className="space-y-4 mb-6">
               <div>
-                <label className="text-xs font-bold text-slate-300 uppercase tracking-wider block mb-2">Location Hub</label>
+                <label className="text-xs font-bold text-slate-300 uppercase tracking-wider block mb-1.5">Location Hub</label>
                 <select 
                   value={location}
                   onChange={(e) => setLocation(e.target.value)}
@@ -228,7 +281,7 @@ export const MatchmakerModal: React.FC<MatchmakerModalProps> = ({
               </div>
 
               <div>
-                <label className="text-xs font-bold text-slate-300 uppercase tracking-wider block mb-2">Match Timing</label>
+                <label className="text-xs font-bold text-slate-300 uppercase tracking-wider block mb-1.5">Match Timing</label>
                 <select 
                   value={time}
                   onChange={(e) => setTime(e.target.value)}
@@ -254,7 +307,7 @@ export const MatchmakerModal: React.FC<MatchmakerModalProps> = ({
                 onClick={handleNext} 
                 className="w-2/3 py-3.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-400 text-black font-black text-xs uppercase tracking-wider glow-emerald transition flex items-center justify-center gap-2 shadow-lg"
               >
-                <span>PUBLISH REAL LOBBY</span>
+                <span>PUBLISH {totalPlayers}-PLAYER LOBBY</span>
                 <Check className="w-4 h-4" />
               </button>
             </div>
