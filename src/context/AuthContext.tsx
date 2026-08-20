@@ -7,6 +7,8 @@ import {
   createUserWithEmailAndPassword, 
   signOut, 
   updateProfile,
+  setPersistence,
+  browserLocalPersistence,
   User 
 } from 'firebase/auth';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
@@ -37,28 +39,42 @@ const AuthContext = createContext<AuthContextType>({
   logout: async () => {}
 });
 
+const STORAGE_KEY = 'spurt_athlete_session';
+
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
 
+  // Restore saved session instantly from local storage on mount
   useEffect(() => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        setUserProfile(parsed);
+      }
+    } catch {
+      // ignore
+    }
+
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       if (firebaseUser) {
+        setUser(firebaseUser);
+
         try {
           const userDocRef = doc(db, 'users', firebaseUser.uid);
           const snap = await getDoc(userDocRef);
 
+          let profile: UserProfile;
           if (snap.exists()) {
-            setUser(firebaseUser);
-            setUserProfile(snap.data() as UserProfile);
+            profile = snap.data() as UserProfile;
           } else {
-            // Auto-provision profile document if missing
-            const fallbackProfile: UserProfile = {
+            profile = {
               uid: firebaseUser.uid,
               email: firebaseUser.email || '',
               displayName: firebaseUser.displayName || 'Athlete',
-              photoURL: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&auto=format&fit=crop&q=80',
+              photoURL: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100',
               preferredArea: 'Greater Noida (Pari Chowk & KP3)',
               preferredSports: ['cricket', 'football'],
               rating: 5.0,
@@ -66,21 +82,24 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
               createdAt: new Date().toISOString()
             };
             try {
-              await setDoc(userDocRef, fallbackProfile);
-              setUser(firebaseUser);
-              setUserProfile(fallbackProfile);
+              await setDoc(userDocRef, profile);
             } catch {
-              setUser(firebaseUser);
-              setUserProfile(fallbackProfile);
+              // ignore
             }
           }
+
+          setUserProfile(profile);
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(profile));
         } catch (err) {
-          console.error('Error in onAuthStateChanged:', err);
-          setUser(firebaseUser);
+          console.warn('Profile fetch note:', err);
         }
       } else {
-        setUser(null);
-        setUserProfile(null);
+        // If not logged in in Firebase Auth
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (!saved) {
+          setUser(null);
+          setUserProfile(null);
+        }
       }
       setLoading(false);
     });
@@ -88,10 +107,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     return () => unsubscribe();
   }, []);
 
-  // Login: If doc is missing in Firestore, auto-provision so user is never locked out
+  // Login with permanent persistence
   const login = async (email: string, pass: string) => {
     setLoading(true);
     try {
+      await setPersistence(auth, browserLocalPersistence);
       const res = await signInWithEmailAndPassword(auth, email, pass);
       const userDocRef = doc(db, 'users', res.user.uid);
       
@@ -105,7 +125,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             uid: res.user.uid,
             email,
             displayName: res.user.displayName || email.split('@')[0],
-            photoURL: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&auto=format&fit=crop&q=80',
+            photoURL: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100',
             preferredArea: 'Greater Noida (Pari Chowk & KP3)',
             preferredSports: ['cricket', 'football'],
             rating: 5.0,
@@ -114,12 +134,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           };
           await setDoc(userDocRef, profile);
         }
-      } catch (firestoreErr) {
+      } catch {
         profile = {
           uid: res.user.uid,
           email,
           displayName: res.user.displayName || email.split('@')[0],
-          photoURL: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&auto=format&fit=crop&q=80',
+          photoURL: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100',
           preferredArea: 'Greater Noida (Pari Chowk & KP3)',
           preferredSports: ['cricket', 'football'],
           rating: 5.0,
@@ -130,16 +150,18 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
       setUser(res.user);
       setUserProfile(profile);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(profile));
     } catch (error: any) {
       setUser(null);
       setUserProfile(null);
+      localStorage.removeItem(STORAGE_KEY);
       throw error;
     } finally {
       setLoading(false);
     }
   };
 
-  // Register: Creates Auth + Firestore doc
+  // Register with permanent persistence
   const register = async (
     email: string, 
     pass: string, 
@@ -148,18 +170,16 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     preferredSports: string[] = ['cricket', 'football']
   ) => {
     setLoading(true);
-    let createdUser: User | null = null;
-
     try {
+      await setPersistence(auth, browserLocalPersistence);
       const res = await createUserWithEmailAndPassword(auth, email, pass);
-      createdUser = res.user;
       await updateProfile(res.user, { displayName });
       
       const newProfile: UserProfile = {
         uid: res.user.uid,
         email,
         displayName,
-        photoURL: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&auto=format&fit=crop&q=80',
+        photoURL: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100',
         preferredArea,
         preferredSports,
         rating: 5.0,
@@ -169,35 +189,41 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
       try {
         await setDoc(doc(db, 'users', res.user.uid), newProfile);
-      } catch (fsErr: any) {
-        console.warn('Firestore setDoc warning:', fsErr);
-        // Continue even if Firestore security rules are still being published
+      } catch {
+        // ignore
       }
 
       setUser(res.user);
       setUserProfile(newProfile);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(newProfile));
     } catch (error: any) {
-      // If email is already in use, try logging in
       if (error.code === 'auth/email-already-in-use') {
         try {
           await login(email, pass);
           return;
-        } catch (loginErr) {
-          throw new Error('This email is already registered. Please click Sign In to enter.');
+        } catch {
+          throw new Error('This email is already registered. Please sign in.');
         }
       }
       setUser(null);
       setUserProfile(null);
+      localStorage.removeItem(STORAGE_KEY);
       throw error;
     } finally {
       setLoading(false);
     }
   };
 
+  // Logout clears session permanently
   const logout = async () => {
-    await signOut(auth);
+    try {
+      await signOut(auth);
+    } catch {
+      // ignore
+    }
     setUser(null);
     setUserProfile(null);
+    localStorage.removeItem(STORAGE_KEY);
   };
 
   return (
