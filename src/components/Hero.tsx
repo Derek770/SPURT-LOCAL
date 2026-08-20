@@ -3,22 +3,29 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { ArrowRight, MapPin, Zap } from 'lucide-react';
-import { SportType } from '@/types';
+import { MatchItem, SportType } from '@/types';
 
 interface HeroProps {
+  matches?: MatchItem[];
   onSelectSport: (sport: SportType) => void;
   onOpenMatchmaker: () => void;
 }
 
-export const Hero: React.FC<HeroProps> = ({ onSelectSport, onOpenMatchmaker }) => {
+export const Hero: React.FC<HeroProps> = ({ matches = [], onSelectSport, onOpenMatchmaker }) => {
   const [activeHoverSport, setActiveHoverSport] = useState<SportType | null>(null);
+
+  const getSportCountText = (sportId: SportType, defaultDesc: string) => {
+    const count = matches.filter((m) => m.sport === sportId).length;
+    if (count === 0) return defaultDesc;
+    return `${count} ${count === 1 ? 'Live Match Lobby' : 'Live Match Lobbies'}`;
+  };
 
   const sportsList = [
     {
       id: 'cricket' as SportType,
       name: 'Cricket',
       tag: 'Box & Turf Matches',
-      activeCount: '8 active lobbies in Greater Noida & Sec 62',
+      activeCount: getSportCountText('cricket', 'Box turf & tournament matchmaking'),
       badgeColor: 'bg-amber-500 text-black',
       image: 'https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?w=1200&auto=format&fit=crop&q=85'
     },
@@ -26,7 +33,7 @@ export const Hero: React.FC<HeroProps> = ({ onSelectSport, onOpenMatchmaker }) =
       id: 'football' as SportType,
       name: 'Football',
       tag: '5v5 Turf & 11s',
-      activeCount: '11 squads forming for tonight',
+      activeCount: getSportCountText('football', '5v5 AstroTurf night friendlies'),
       badgeColor: 'bg-emerald-500 text-black',
       image: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=1200&auto=format&fit=crop&q=85'
     },
@@ -34,7 +41,7 @@ export const Hero: React.FC<HeroProps> = ({ onSelectSport, onOpenMatchmaker }) =
       id: 'badminton' as SportType,
       name: 'Badminton',
       tag: 'Singles & Doubles',
-      activeCount: 'Indoor wooden & synthetic courts',
+      activeCount: getSportCountText('badminton', 'Indoor wooden & synthetic courts'),
       badgeColor: 'bg-rose-500 text-white',
       image: 'https://images.unsplash.com/photo-1626224583764-f87db24ac4ea?w=1200&auto=format&fit=crop&q=85'
     },
@@ -42,7 +49,7 @@ export const Hero: React.FC<HeroProps> = ({ onSelectSport, onOpenMatchmaker }) =
       id: 'table_tennis' as SportType,
       name: 'Table Tennis',
       tag: 'Ranked 1v1 Duels',
-      activeCount: 'Fast rallies & club duels',
+      activeCount: getSportCountText('table_tennis', 'Ranked 1v1 Elo duels & club play'),
       badgeColor: 'bg-cyan-500 text-black',
       image: 'https://images.unsplash.com/photo-1609710228159-0fa9bd7c0827?w=1200&auto=format&fit=crop&q=85'
     }
@@ -55,7 +62,7 @@ export const Hero: React.FC<HeroProps> = ({ onSelectSport, onOpenMatchmaker }) =
 
       <div className="relative rounded-3xl overflow-hidden border border-white/15 shadow-2xl bg-slate-950">
         
-        {/* Quad Split Action Panels (4-Way Interactive Sports Accordion) */}
+        {/* Quad Split Action Panels */}
         <div className="w-full flex flex-col lg:flex-row min-h-[580px]">
           {sportsList.map((sport) => {
             const isHovered = activeHoverSport === sport.id;
@@ -69,17 +76,13 @@ export const Hero: React.FC<HeroProps> = ({ onSelectSport, onOpenMatchmaker }) =
                   isHovered ? 'lg:flex-[2.2] brightness-110' : (activeHoverSport ? 'lg:flex-[0.6] brightness-50' : 'lg:flex-1')
                 } min-h-[140px] lg:min-h-[580px]`}
               >
-                {/* Background Sport Image */}
                 <img 
                   src={sport.image} 
                   alt={sport.name} 
                   className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" 
                 />
-
-                {/* Scrim Overlay */}
                 <div className="absolute inset-0 bg-gradient-to-t from-[#070D18] via-[#070D18]/60 to-transparent"></div>
 
-                {/* Isolated Bottom Label for this specific panel */}
                 <div className="relative z-10 pointer-events-none">
                   <span className={`px-2.5 py-1 rounded-full text-[11px] font-black uppercase tracking-wider backdrop-blur-md shadow-md inline-block ${sport.badgeColor}`}>
                     {sport.name}

@@ -128,6 +128,7 @@ export default function HomePage() {
 
       {/* Hero Section */}
       <Hero 
+        matches={matches}
         onSelectSport={handleSelectSport}
         onOpenMatchmaker={handleOpenMatchmaker}
       />

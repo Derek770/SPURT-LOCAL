@@ -23,7 +23,7 @@ export default function LoginPage() {
       tagline: 'Box Cricket & Turf Matches',
       quote: 'Smash boundaries under the floodlights with verified neighborhood squads across NCR.',
       venue: 'Pari Chowk Arena, Greater Noida',
-      liveCount: '8 Lobbies Active',
+      liveCount: 'Verified Matches',
       accentColor: 'text-amber-400 bg-amber-500/20 border-amber-500/40',
       image: 'https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?w=1920&auto=format&fit=crop&q=90'
     },
@@ -32,7 +32,7 @@ export default function LoginPage() {
       tagline: '5v5 AstroTurf & Weekend 11s',
       quote: 'High-intensity night games, floodlit pitches, and guaranteed zero last-minute ghosting.',
       venue: 'KickOff Arena, Sector 104, Noida',
-      liveCount: '11 Squads Forming',
+      liveCount: 'AstroTurf Matches',
       accentColor: 'text-emerald-400 bg-emerald-500/20 border-emerald-500/40',
       image: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=1920&auto=format&fit=crop&q=90'
     },
@@ -41,7 +41,7 @@ export default function LoginPage() {
       tagline: 'Indoor Wooden Court Ladders',
       quote: 'Jump smashes, doubles partnerships, and air-conditioned court bookings.',
       venue: 'Smash Academy, Knowledge Park 3',
-      liveCount: '6 Courts Open',
+      liveCount: 'Indoor Matches',
       accentColor: 'text-rose-400 bg-rose-500/20 border-rose-500/40',
       image: 'https://images.unsplash.com/photo-1626224583764-f87db24ac4ea?w=1920&auto=format&fit=crop&q=90'
     },
@@ -50,7 +50,7 @@ export default function LoginPage() {
       tagline: 'Ranked 1v1 Elo Duels',
       quote: 'Precision topspin duels, community club leagues, and fast-paced rallies.',
       venue: 'DLF Prime TT Club, South Delhi',
-      liveCount: '5 Ranked Duels',
+      liveCount: 'Ranked Matches',
       accentColor: 'text-cyan-400 bg-cyan-500/20 border-cyan-500/40',
       image: 'https://images.unsplash.com/photo-1609710228159-0fa9bd7c0827?w=1920&auto=format&fit=crop&q=90'
     }

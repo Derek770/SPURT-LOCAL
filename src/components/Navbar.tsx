@@ -22,10 +22,10 @@ export const Navbar: React.FC<NavbarProps> = ({
   const [isLocationOpen, setIsLocationOpen] = useState(false);
 
   const locations = [
-    { name: 'Greater Noida', count: '12 Active' },
-    { name: 'Noida Sector 62 / 104', count: '18 Active' },
-    { name: 'South Delhi', count: '15 Active' },
-    { name: 'Dwarka', count: '8 Active' },
+    'Greater Noida (Pari Chowk & KP3)',
+    'Noida Sector 62 / 104',
+    'South Delhi (Saket / Siri Fort)',
+    'Dwarka Sports Complex'
   ];
 
   return (
@@ -66,24 +66,23 @@ export const Navbar: React.FC<NavbarProps> = ({
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-800/80 hover:bg-slate-700/80 border border-white/10 text-xs font-semibold text-slate-200 transition"
             >
               <MapPin className="w-3 h-3 text-orange-400" />
-              <span className="max-w-[100px] truncate">{selectedLocation}</span>
+              <span className="max-w-[120px] truncate">{selectedLocation}</span>
               <ChevronDown className="w-3 h-3 text-slate-400" />
             </button>
 
             {isLocationOpen && (
-              <div className="absolute right-0 mt-2 w-56 glass-card rounded-2xl p-2 shadow-2xl border border-white/15 z-50">
+              <div className="absolute right-0 mt-2 w-64 glass-card rounded-2xl p-2 shadow-2xl border border-white/15 z-50">
                 <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400 px-3 py-1.5">Select NCR Hub</div>
                 {locations.map((loc) => (
                   <button
-                    key={loc.name}
+                    key={loc}
                     onClick={() => {
-                      if (onSelectLocation) onSelectLocation(loc.name);
+                      if (onSelectLocation) onSelectLocation(loc);
                       setIsLocationOpen(false);
                     }}
-                    className="w-full text-left px-3 py-2 text-xs rounded-xl hover:bg-orange-500/20 hover:text-orange-300 text-slate-200 transition flex items-center justify-between"
+                    className="w-full text-left px-3 py-2 text-xs rounded-xl hover:bg-orange-500/20 hover:text-orange-300 text-slate-200 transition"
                   >
-                    <span>{loc.name}</span>
-                    <span className="text-[10px] text-slate-400">{loc.count}</span>
+                    <span>{loc}</span>
                   </button>
                 ))}
               </div>
