@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { X, ArrowRight, ArrowLeft, Zap, Trophy, ShieldCheck } from 'lucide-react';
+import { X, ArrowRight, ArrowLeft, Zap, Trophy, ShieldCheck, Check } from 'lucide-react';
 import { SportType, UserProfile } from '@/types';
 
 interface MatchmakerModalProps {
@@ -33,19 +33,23 @@ export const MatchmakerModal: React.FC<MatchmakerModalProps> = ({
       setStep(step + 1);
     } else {
       // Submit
+      const totalSlots = sport === 'table_tennis' ? 2 : sport === 'badminton' ? 4 : 10;
+      const filledSlots = 1;
+      const availableSlots = totalSlots - filledSlots;
+
       onSubmit({
         sport,
         title: `${sport.toUpperCase()} Squad Match (${format})`,
         venue: `${location} Arena`,
         area: location.split(' ')[0],
         time: `Today, ${time}`,
-        totalSlots: sport === 'table_tennis' ? 2 : sport === 'badminton' ? 4 : 10,
-        filledSlots: 1,
-        availableSlots: (sport === 'table_tennis' ? 2 : sport === 'badminton' ? 4 : 10) - 1,
+        totalSlots,
+        filledSlots,
+        availableSlots,
         skill,
-        price: '?200/player',
+        price: 'Rs. 200 / player',
         surface: 'Verified Partner Court',
-        badge: '?? Newly Created Lobby',
+        badge: `${availableSlots} Slots Left`,
         host: {
           uid: currentUser?.uid || 'guest_host',
           displayName: currentUser?.displayName || 'Host Player',
@@ -85,14 +89,14 @@ export const MatchmakerModal: React.FC<MatchmakerModalProps> = ({
         {step === 1 && (
           <div>
             <h3 className="font-display font-extrabold text-xl text-white mb-1">Select Your Sport</h3>
-            <p className="text-xs text-slate-400 mb-4">Choose which game you want to jump into today.</p>
+            <p className="text-xs text-slate-400 mb-4">Choose which game you want to host today.</p>
 
             <div className="grid grid-cols-2 gap-3 mb-6">
               {[
-                { id: 'cricket', name: 'Cricket', icon: '??', sub: 'Box & Turf' },
-                { id: 'football', name: 'Football', icon: '?', sub: '5v5 & 7v7' },
-                { id: 'badminton', name: 'Badminton', icon: '??', sub: 'Singles & Doubles' },
-                { id: 'table_tennis', name: 'Table Tennis', icon: '??', sub: '1v1 & Duels' },
+                { id: 'cricket', name: 'Cricket', sub: 'Box Turf & T20' },
+                { id: 'football', name: 'Football', sub: '5v5 Turf & 11s' },
+                { id: 'badminton', name: 'Badminton', sub: 'Singles & Doubles' },
+                { id: 'table_tennis', name: 'Table Tennis', sub: '1v1 & Elo Duels' },
               ].map((s) => (
                 <div 
                   key={s.id}
@@ -103,9 +107,8 @@ export const MatchmakerModal: React.FC<MatchmakerModalProps> = ({
                       : 'border-white/10 bg-slate-800/40 hover:border-white/20'
                   }`}
                 >
-                  <div className="text-3xl mb-1">{s.icon}</div>
-                  <div className="font-bold text-sm text-white">{s.name}</div>
-                  <div className="text-[10px] text-slate-300">{s.sub}</div>
+                  <div className="font-bold text-base text-white">{s.name}</div>
+                  <div className="text-xs text-slate-400 mt-0.5">{s.sub}</div>
                 </div>
               ))}
             </div>
@@ -154,8 +157,9 @@ export const MatchmakerModal: React.FC<MatchmakerModalProps> = ({
                 <label className="text-xs font-bold text-slate-300 uppercase tracking-wider block mb-2">Skill Tier</label>
                 <div className="space-y-2">
                   {[
-                    { label: 'Casual / Recreational', sub: 'Play for fun, fitness, and friendly rallies', badge: '? Low Pressure' },
-                    { label: 'Intermediate', sub: 'Regular player with solid fundamentals & pace', badge: '?? Solid Game' },
+                    { label: 'Casual / Recreational', sub: 'Play for fun, fitness, and friendly rallies', badge: 'Recreational' },
+                    { label: 'Intermediate', sub: 'Regular player with solid fundamentals & pace', badge: 'Intermediate' },
+                    { label: 'Competitive / Advanced', sub: 'High-intensity, tactical, and fast-paced fixtures', badge: 'Advanced' },
                   ].map((sk) => (
                     <label 
                       key={sk.label}
@@ -163,7 +167,7 @@ export const MatchmakerModal: React.FC<MatchmakerModalProps> = ({
                         skill === sk.label ? 'border-orange-500 bg-orange-500/10 text-white' : 'border-white/10 bg-slate-800/60 text-slate-300'
                       }`}
                     >
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-2.5">
                         <input 
                           type="radio" 
                           name="modal-skill" 
@@ -176,7 +180,7 @@ export const MatchmakerModal: React.FC<MatchmakerModalProps> = ({
                           <div className="text-[10px] text-slate-400">{sk.sub}</div>
                         </div>
                       </div>
-                      <span className="text-emerald-400 text-xs font-medium">{sk.badge}</span>
+                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-slate-800 border border-white/10 text-orange-300 font-semibold">{sk.badge}</span>
                     </label>
                   ))}
                 </div>
@@ -186,15 +190,16 @@ export const MatchmakerModal: React.FC<MatchmakerModalProps> = ({
             <div className="flex items-center gap-3">
               <button 
                 onClick={() => setStep(1)} 
-                className="w-1/3 py-3 rounded-xl bg-slate-800 text-slate-300 hover:text-white font-bold text-xs uppercase tracking-wider transition flex items-center justify-center gap-1"
+                className="w-1/3 py-3 rounded-xl border border-white/15 text-slate-300 hover:text-white font-bold text-xs uppercase tracking-wider transition flex items-center justify-center gap-1.5"
               >
-                <ArrowLeft className="w-3.5 h-3.5" /> Back
+                <ArrowLeft className="w-3.5 h-3.5" />
+                <span>Back</span>
               </button>
               <button 
                 onClick={handleNext} 
-                className="w-2/3 py-3 rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 text-white font-extrabold text-xs uppercase tracking-wider glow-orange transition flex items-center justify-center gap-2"
+                className="w-2/3 py-3.5 rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 text-white font-extrabold text-xs uppercase tracking-wider glow-orange transition flex items-center justify-center gap-2"
               >
-                <span>Set Location & Time</span>
+                <span>Continue to Venue & Time</span>
                 <ArrowRight className="w-4 h-4" />
               </button>
             </div>
@@ -204,35 +209,35 @@ export const MatchmakerModal: React.FC<MatchmakerModalProps> = ({
         {/* Step 3: Location & Time */}
         {step === 3 && (
           <div>
-            <h3 className="font-display font-extrabold text-xl text-white mb-1">Location & Preferred Slot</h3>
-            <p className="text-xs text-slate-400 mb-4">Finalize your slot to get matched with active lobbies.</p>
+            <h3 className="font-display font-extrabold text-xl text-white mb-1">Select Venue & Time Slot</h3>
+            <p className="text-xs text-slate-400 mb-4">Choose preferred hub for this match fixture.</p>
 
             <div className="space-y-4 mb-6">
               <div>
-                <label className="text-xs font-bold text-slate-300 uppercase tracking-wider block mb-1.5">Preferred Area</label>
+                <label className="text-xs font-bold text-slate-300 uppercase tracking-wider block mb-2">Location Hub</label>
                 <select 
                   value={location}
                   onChange={(e) => setLocation(e.target.value)}
-                  className="w-full px-3.5 py-3 rounded-xl bg-slate-800 border border-white/15 text-xs text-white focus:outline-none focus:border-orange-500"
+                  className="w-full px-4 py-3 rounded-xl bg-slate-900 border border-white/15 text-xs text-white focus:outline-none focus:border-orange-500"
                 >
-                  <option value="Greater Noida (Pari Chowk & KP3)">?? Greater Noida (Pari Chowk & KP3)</option>
-                  <option value="Noida Sector 62 / 104">?? Noida Sector 62 / 104</option>
-                  <option value="South Delhi (Saket / Siri Fort)">?? South Delhi (Saket / Siri Fort)</option>
-                  <option value="Dwarka Sports Complex">?? Dwarka Sports Complex</option>
+                  <option value="Greater Noida (Pari Chowk & KP3)">Greater Noida (Pari Chowk & KP3)</option>
+                  <option value="Noida Sector 62 / 104">Noida Sector 62 / 104</option>
+                  <option value="South Delhi (Saket / Siri Fort)">South Delhi (Saket / Siri Fort)</option>
+                  <option value="Dwarka Sports Complex">Dwarka Sports Complex</option>
                 </select>
               </div>
 
               <div>
-                <label className="text-xs font-bold text-slate-300 uppercase tracking-wider block mb-1.5">Preferred Time</label>
+                <label className="text-xs font-bold text-slate-300 uppercase tracking-wider block mb-2">Match Timing</label>
                 <select 
                   value={time}
                   onChange={(e) => setTime(e.target.value)}
-                  className="w-full px-3.5 py-3 rounded-xl bg-slate-800 border border-white/15 text-xs text-white focus:outline-none focus:border-orange-500"
+                  className="w-full px-4 py-3 rounded-xl bg-slate-900 border border-white/15 text-xs text-white focus:outline-none focus:border-orange-500"
                 >
                   <option value="Tonight (8:00 PM - 10:00 PM)">Tonight (8:00 PM - 10:00 PM)</option>
-                  <option value="Tonight Late (10:00 PM - 11:30 PM)">Tonight Late (10:00 PM - 11:30 PM)</option>
-                  <option value="Tomorrow Morning (6:30 AM - 8:30 AM)">Tomorrow Morning (6:30 AM - 8:30 AM)</option>
-                  <option value="Weekend Evening (6:00 PM - 8:00 PM)">Weekend Evening (6:00 PM - 8:00 PM)</option>
+                  <option value="Tomorrow Morning (7:00 AM - 9:00 AM)">Tomorrow Morning (7:00 AM - 9:00 AM)</option>
+                  <option value="Tomorrow Evening (6:30 PM - 8:30 PM)">Tomorrow Evening (6:30 PM - 8:30 PM)</option>
+                  <option value="Weekend Special (5:00 PM - 7:00 PM)">Weekend Special (5:00 PM - 7:00 PM)</option>
                 </select>
               </div>
             </div>
@@ -240,16 +245,17 @@ export const MatchmakerModal: React.FC<MatchmakerModalProps> = ({
             <div className="flex items-center gap-3">
               <button 
                 onClick={() => setStep(2)} 
-                className="w-1/3 py-3 rounded-xl bg-slate-800 text-slate-300 hover:text-white font-bold text-xs uppercase tracking-wider transition flex items-center justify-center gap-1"
+                className="w-1/3 py-3 rounded-xl border border-white/15 text-slate-300 hover:text-white font-bold text-xs uppercase tracking-wider transition flex items-center justify-center gap-1.5"
               >
-                <ArrowLeft className="w-3.5 h-3.5" /> Back
+                <ArrowLeft className="w-3.5 h-3.5" />
+                <span>Back</span>
               </button>
               <button 
                 onClick={handleNext} 
-                className="w-2/3 py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-400 text-black font-extrabold text-xs uppercase tracking-wider glow-emerald transition flex items-center justify-center gap-2"
+                className="w-2/3 py-3.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-400 text-black font-black text-xs uppercase tracking-wider glow-emerald transition flex items-center justify-center gap-2 shadow-lg"
               >
-                <Zap className="w-4 h-4 fill-black text-black" />
-                <span>?? Confirm & Join Match</span>
+                <span>PUBLISH REAL LOBBY</span>
+                <Check className="w-4 h-4" />
               </button>
             </div>
           </div>

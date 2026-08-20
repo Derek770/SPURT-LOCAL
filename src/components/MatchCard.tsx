@@ -13,19 +13,21 @@ interface MatchCardProps {
 
 export const MatchCard: React.FC<MatchCardProps> = ({ match, currentUser, onJoin, onLeave }) => {
   const isJoined = currentUser ? match.playerUids.includes(currentUser.uid) : false;
-  const slotsLeft = match.totalSlots - match.filledSlots;
+  const slotsLeft = Math.max(0, match.totalSlots - match.filledSlots);
   const isFull = slotsLeft <= 0;
 
-  const sportMeta = {
-    cricket: { name: 'Cricket', icon: '??', color: 'text-amber-400', bg: 'bg-amber-500/10 border-amber-500/30' },
-    football: { name: 'Football', icon: '?', color: 'text-emerald-400', bg: 'bg-emerald-500/10 border-emerald-500/30' },
-    badminton: { name: 'Badminton', icon: '??', color: 'text-rose-400', bg: 'bg-rose-500/10 border-rose-500/30' },
-    table_tennis: { name: 'Table Tennis', icon: '??', color: 'text-cyan-400', bg: 'bg-cyan-500/10 border-cyan-500/30' }
-  }[match.sport] || { name: 'Sports', icon: '?', color: 'text-orange-400', bg: 'bg-orange-500/10 border-orange-500/30' };
+  const sportColors: Record<string, { bg: string; text: string }> = {
+    cricket: { bg: 'bg-amber-500/15 border-amber-500/30', text: 'text-amber-400' },
+    football: { bg: 'bg-emerald-500/15 border-emerald-500/30', text: 'text-emerald-400' },
+    badminton: { bg: 'bg-rose-500/15 border-rose-500/30', text: 'text-rose-400' },
+    table_tennis: { bg: 'bg-cyan-500/15 border-cyan-500/30', text: 'text-cyan-400' }
+  };
+
+  const currentSportTheme = sportColors[match.sport] || { bg: 'bg-orange-500/15 border-orange-500/30', text: 'text-orange-400' };
 
   return (
     <div className="glass-card glass-card-hover rounded-2xl p-5 border border-white/10 flex flex-col justify-between relative overflow-hidden group">
-      {/* Glow Strip */}
+      {/* Glow Top Strip */}
       <div className={`absolute top-0 left-0 right-0 h-1 bg-gradient-to-r ${
         match.sport === 'cricket' ? 'from-amber-500 to-orange-500' :
         match.sport === 'football' ? 'from-emerald-500 to-teal-400' :
@@ -35,14 +37,14 @@ export const MatchCard: React.FC<MatchCardProps> = ({ match, currentUser, onJoin
 
       <div>
         <div className="flex items-center justify-between gap-2 mb-3">
-          <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold border ${sportMeta.bg} ${sportMeta.color}`}>
-            <span>{sportMeta.icon}</span> {sportMeta.name}
+          <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider border ${currentSportTheme.bg} ${currentSportTheme.text}`}>
+            {match.sport.replace('_', ' ')}
           </span>
-          <span className={`text-xs font-medium px-2.5 py-0.5 rounded-full ${
+          <span className={`text-xs font-bold px-2.5 py-0.5 rounded-full ${
             isJoined ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' :
             isFull ? 'bg-red-500/20 text-red-300' : 'bg-orange-500/20 text-orange-300'
           }`}>
-            {isJoined ? '? You are in!' : match.badge}
+            {isJoined ? 'You are in!' : (isFull ? 'Lobby Full' : `${slotsLeft} ${slotsLeft === 1 ? 'Slot Left' : 'Slots Left'}`)}
           </span>
         </div>
 
@@ -72,11 +74,11 @@ export const MatchCard: React.FC<MatchCardProps> = ({ match, currentUser, onJoin
       </div>
 
       <div className="pt-2">
-        {/* Slot progress */}
+        {/* Real Slot Progress Meter */}
         <div className="w-full bg-slate-800/80 rounded-full h-1.5 mb-3 overflow-hidden">
           <div 
             className={`h-full rounded-full transition-all duration-500 ${slotsLeft <= 2 ? 'bg-orange-500' : 'bg-emerald-400'}`} 
-            style={{ width: `${(match.filledSlots / match.totalSlots) * 100}%` }}
+            style={{ width: `${Math.min(100, (match.filledSlots / match.totalSlots) * 100)}%` }}
           ></div>
         </div>
 
@@ -96,15 +98,16 @@ export const MatchCard: React.FC<MatchCardProps> = ({ match, currentUser, onJoin
           <button
             onClick={() => isJoined ? onLeave(match.id) : onJoin(match.id)}
             disabled={!isJoined && isFull}
-            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all shadow-md ${
+            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all shadow-md flex items-center gap-1.5 ${
               isJoined
-                ? 'bg-emerald-600 text-white hover:bg-red-600 hover:shadow-red-600/30'
+                ? 'bg-emerald-600 text-white hover:bg-red-600'
                 : isFull
                 ? 'bg-slate-800 text-slate-500 cursor-not-allowed border border-white/5'
                 : 'bg-gradient-to-r from-orange-500 to-amber-500 text-white hover:from-orange-600 hover:to-amber-600 glow-orange'
             }`}
           >
-            {isJoined ? 'Joined ?' : isFull ? 'Lobby Full' : 'Join Match'}
+            {isJoined && <Check className="w-3.5 h-3.5" />}
+            <span>{isJoined ? 'Joined' : isFull ? 'Lobby Full' : 'Join Match'}</span>
           </button>
         </div>
       </div>

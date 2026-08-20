@@ -13,48 +13,48 @@ export const SportCards: React.FC<SportCardsProps> = ({ onSelectSport }) => {
     {
       id: 'cricket' as SportType,
       title: 'Cricket',
-      badge: '?? 8 Lobbies Today',
+      badge: 'Box & Turf Matchmaking',
       color: 'amber',
       borderClass: 'border-amber-500/20',
       btnClass: 'bg-amber-500/15 hover:bg-amber-500 text-amber-300 hover:text-black border-amber-500/30',
       tagClass: 'text-amber-400 border-amber-400/30',
-      btnText: 'Find Cricket Matches ?',
+      btnText: 'Find Cricket Matches',
       desc: 'Box Cricket turf battles, T20 leather ball fixtures, and neighborhood tennis-ball tournaments.',
       image: 'https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?w=600&auto=format&fit=crop&q=80'
     },
     {
       id: 'football' as SportType,
       title: 'Football',
-      badge: '? 11 Lobbies Today',
+      badge: '5v5 AstroTurf & 11s',
       color: 'emerald',
       borderClass: 'border-emerald-500/20',
       btnClass: 'bg-emerald-500/15 hover:bg-emerald-500 text-emerald-300 hover:text-black border-emerald-500/30',
       tagClass: 'text-emerald-400 border-emerald-400/30',
-      btnText: 'Join Football Squads ?',
+      btnText: 'Join Football Squads',
       desc: 'Floodlit 5v5 turf games, 7v7 friendlies, and weekend amateur recreational leagues.',
       image: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=600&auto=format&fit=crop&q=80'
     },
     {
       id: 'badminton' as SportType,
       title: 'Badminton',
-      badge: '?? 6 Lobbies Today',
+      badge: 'Singles & Doubles Pairs',
       color: 'rose',
       borderClass: 'border-rose-500/20',
       btnClass: 'bg-rose-500/15 hover:bg-rose-500 text-rose-300 hover:text-black border-rose-500/30',
       tagClass: 'text-rose-400 border-rose-400/30',
-      btnText: 'Connect with Partners ?',
+      btnText: 'Connect with Partners',
       desc: 'Singles ladders, mixed doubles pairings, and indoor court slot bookings in AC venues.',
       image: 'https://images.unsplash.com/photo-1626224583764-f87db24ac4ea?w=600&auto=format&fit=crop&q=80'
     },
     {
       id: 'table_tennis' as SportType,
       title: 'Table Tennis',
-      badge: '?? 5 Lobbies Today',
+      badge: 'Ranked 1v1 Elo Duels',
       color: 'cyan',
       borderClass: 'border-cyan-500/20',
       btnClass: 'bg-cyan-500/15 hover:bg-cyan-500 text-cyan-300 hover:text-black border-cyan-500/30',
       tagClass: 'text-cyan-400 border-cyan-400/30',
-      btnText: 'Challenge TT Players ?',
+      btnText: 'Challenge TT Players',
       desc: '1v1 ranked Elo duels, community club rallies, and casual ping-pong knockouts.',
       image: 'https://images.unsplash.com/photo-1609710228159-0fa9bd7c0827?w=600&auto=format&fit=crop&q=80'
     }
@@ -90,9 +90,10 @@ export const SportCards: React.FC<SportCardsProps> = ({ onSelectSport }) => {
             </div>
             <button 
               onClick={() => onSelectSport(sport.id)}
-              className={`w-full py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider transition border ${sport.btnClass}`}
+              className={`w-full py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider transition border ${sport.btnClass} flex items-center justify-center gap-1.5`}
             >
-              {sport.btnText}
+              <span>{sport.btnText}</span>
+              <ArrowRight className="w-3.5 h-3.5" />
             </button>
           </div>
         ))}
