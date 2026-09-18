@@ -11,6 +11,10 @@ export interface UserProfile {
   matchesPlayed?: number;
   bestReflexMs?: number;
   bestKeepieUppie?: number;
+  karmaScore?: number;
+  mvpCount?: number;
+  trophies?: string[];
+  upiId?: string;
   createdAt?: string;
 }
 
@@ -18,6 +22,13 @@ export interface MatchHost {
   uid: string;
   displayName: string;
   photoURL?: string;
+  karmaScore?: number;
+}
+
+export interface TeamPlayer {
+  uid: string;
+  displayName: string;
+  skill: string;
 }
 
 export interface MatchItem {
@@ -37,6 +48,20 @@ export interface MatchItem {
   host: MatchHost;
   playerUids: string[];
   createdAt?: string | number;
+  turfCost?: number;
+  hostUpiId?: string;
+  paidPlayerUids?: string[];
+  checkedInPlayerUids?: string[];
+  isSosActive?: boolean;
+  sosMessage?: string;
+  coordinates?: { lat: number; lng: number };
+  teams?: {
+    teamA: TeamPlayer[];
+    teamB: TeamPlayer[];
+  };
+  mvpVotes?: Record<string, string>;
+  mvpWinner?: { uid: string; displayName: string; votes: number };
+  status?: 'open' | 'sos' | 'ongoing' | 'completed';
 }
 
 export interface ChatMessage {

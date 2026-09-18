@@ -1,9 +1,10 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Search, PlusCircle, Sparkles } from 'lucide-react';
+import { Search, PlusCircle, Sparkles, LayoutGrid, Map, Flame } from 'lucide-react';
 import { MatchItem, SportType, UserProfile } from '@/types';
 import { MatchCard } from './MatchCard';
+import { PitchRadarMap } from './PitchRadarMap';
 
 interface MatchFeedProps {
   matches: MatchItem[];
@@ -14,6 +15,11 @@ interface MatchFeedProps {
   onLeaveMatch: (matchId: string) => void;
   onOpenMatchmaker: () => void;
   onOpenChat?: (match: MatchItem) => void;
+  onOpenSplitter?: (match: MatchItem) => void;
+  onOpenBalancer?: (match: MatchItem) => void;
+  onOpenMvp?: (match: MatchItem) => void;
+  onToggleSos?: (match: MatchItem) => void;
+  onCheckIn?: (match: MatchItem) => void;
 }
 
 export const MatchFeed: React.FC<MatchFeedProps> = ({
@@ -24,11 +30,24 @@ export const MatchFeed: React.FC<MatchFeedProps> = ({
   onJoinMatch,
   onLeaveMatch,
   onOpenMatchmaker,
-  onOpenChat
+  onOpenChat,
+  onOpenSplitter,
+  onOpenBalancer,
+  onOpenMvp,
+  onToggleSos,
+  onCheckIn
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
+  const [viewMode, setViewMode] = useState<'grid' | 'radar'>('grid');
 
-  const filteredMatches = matches.filter((m) => {
+  // Sort matches: SOS active matches first, then normal
+  const sortedMatches = [...matches].sort((a, b) => {
+    if (a.isSosActive && !b.isSosActive) return -1;
+    if (!a.isSosActive && b.isSosActive) return 1;
+    return 0;
+  });
+
+  const filteredMatches = sortedMatches.filter((m) => {
     const matchesSport = currentSport === 'all' || m.sport === currentSport;
     const matchesSearch = !searchQuery || 
       m.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
@@ -47,6 +66,8 @@ export const MatchFeed: React.FC<MatchFeedProps> = ({
 
   return (
     <section id="matches-section" className="py-12 px-4 sm:px-6 max-w-7xl mx-auto">
+      
+      {/* Control Dashboard Box */}
       <div className="glass-card rounded-3xl p-6 sm:p-8 border border-white/10 mb-8">
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
           <div>
@@ -60,20 +81,49 @@ export const MatchFeed: React.FC<MatchFeedProps> = ({
             </p>
           </div>
 
-          <div className="flex-1 max-w-md">
-            <div className="relative">
+          <div className="flex items-center gap-3 w-full lg:w-auto">
+            {/* Search Input */}
+            <div className="relative flex-1 lg:w-72">
               <input 
                 type="text" 
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search venue, sport, or area (e.g. Pari Chowk, Sec 62)..." 
-                className="w-full px-4 py-3 pl-10 rounded-2xl bg-slate-900/90 border border-white/15 text-xs sm:text-sm text-white placeholder-slate-500 focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 transition"
+                placeholder="Search venue, sport, or area..." 
+                className="w-full px-4 py-2.5 pl-9 rounded-2xl bg-slate-900/90 border border-white/15 text-xs sm:text-sm text-white placeholder-slate-500 focus:outline-none focus:border-orange-500 transition"
               />
-              <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-3.5" />
+              <Search className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
+            </div>
+
+            {/* View Switcher Toggle: Grid vs Radar */}
+            <div className="flex items-center p-1 rounded-2xl bg-slate-900 border border-white/10 shrink-0">
+              <button
+                onClick={() => setViewMode('grid')}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition ${
+                  viewMode === 'grid'
+                    ? 'bg-gradient-to-r from-orange-500 to-amber-500 text-white shadow-md'
+                    : 'text-slate-400 hover:text-white'
+                }`}
+              >
+                <LayoutGrid className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">Grid Feed</span>
+              </button>
+
+              <button
+                onClick={() => setViewMode('radar')}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition ${
+                  viewMode === 'radar'
+                    ? 'bg-gradient-to-r from-cyan-500 to-emerald-400 text-black shadow-md font-extrabold'
+                    : 'text-slate-400 hover:text-white'
+                }`}
+              >
+                <Map className="w-3.5 h-3.5" />
+                <span>Pitch Radar</span>
+              </button>
             </div>
           </div>
         </div>
 
+        {/* Filter Tabs */}
         <div className="flex flex-wrap items-center justify-between gap-3 mt-6 pt-6 border-t border-white/10">
           <div className="flex flex-wrap items-center gap-2">
             {sportsTabs.map((tab) => (
@@ -97,8 +147,15 @@ export const MatchFeed: React.FC<MatchFeedProps> = ({
         </div>
       </div>
 
-      {/* Empty State when 0 matches in Firestore */}
-      {filteredMatches.length === 0 ? (
+      {/* Render View: Pitch Radar Map vs Grid Feed */}
+      {viewMode === 'radar' ? (
+        <PitchRadarMap
+          matches={filteredMatches}
+          currentSport={currentSport}
+          onSelectMatch={(m) => onOpenChat && onOpenChat(m)}
+          onOpenMatchmaker={onOpenMatchmaker}
+        />
+      ) : filteredMatches.length === 0 ? (
         <div className="text-center py-16 px-6 glass-card rounded-3xl border border-white/10 max-w-2xl mx-auto shadow-2xl">
           <div className="w-16 h-16 mx-auto rounded-full bg-orange-500/20 border border-orange-500/40 flex items-center justify-center text-orange-400 mb-4 shadow-lg">
             <Sparkles className="w-8 h-8" />
@@ -127,6 +184,11 @@ export const MatchFeed: React.FC<MatchFeedProps> = ({
               onJoin={onJoinMatch} 
               onLeave={onLeaveMatch}
               onOpenChat={onOpenChat}
+              onOpenSplitter={onOpenSplitter}
+              onOpenBalancer={onOpenBalancer}
+              onOpenMvp={onOpenMvp}
+              onToggleSos={onToggleSos}
+              onCheckIn={onCheckIn}
             />
           ))}
         </div>

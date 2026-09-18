@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { X, ArrowRight, ArrowLeft, Zap, Trophy, ShieldCheck, Check, Users, Plus, Minus } from 'lucide-react';
+import { X, ArrowRight, ArrowLeft, Zap, Trophy, ShieldCheck, Check, Users, Plus, Minus, Wallet } from 'lucide-react';
 import { SportType, UserProfile } from '@/types';
 
 interface MatchmakerModalProps {
@@ -26,6 +26,8 @@ export const MatchmakerModal: React.FC<MatchmakerModalProps> = ({
   const [location, setLocation] = useState('Greater Noida (Pari Chowk & KP3)');
   const [time, setTime] = useState('Tonight (8:00 PM - 10:00 PM)');
   const [totalPlayers, setTotalPlayers] = useState<number>(16);
+  const [turfCost, setTurfCost] = useState<number>(1200);
+  const [hostUpiId, setHostUpiId] = useState<string>('spurt.host@okaxis');
 
   const sportCapacityPresets: Record<string, number[]> = {
     cricket: [12, 16, 22],
@@ -49,6 +51,13 @@ export const MatchmakerModal: React.FC<MatchmakerModalProps> = ({
       const totalSlots = Math.max(2, totalPlayers);
       const filledSlots = 1;
       const availableSlots = totalSlots - filledSlots;
+      const perHead = Math.ceil(turfCost / totalSlots);
+
+      // Geo coordinates mapping
+      const coordinates = location.includes('Greater Noida') ? { lat: 28.4744, lng: 77.5040 } :
+                          location.includes('Noida') ? { lat: 28.5700, lng: 77.3800 } :
+                          location.includes('South Delhi') ? { lat: 28.5244, lng: 77.2066 } :
+                          { lat: 28.5921, lng: 77.0460 };
 
       onSubmit({
         sport,
@@ -60,13 +69,17 @@ export const MatchmakerModal: React.FC<MatchmakerModalProps> = ({
         filledSlots,
         availableSlots,
         skill,
-        price: 'Rs. 200 / player',
+        price: `Rs. ${perHead} / player`,
         surface: 'Verified Partner Court',
         badge: `${availableSlots} Slots Left`,
+        turfCost: Number(turfCost) || 1200,
+        hostUpiId: hostUpiId.trim() || 'spurt.host@okaxis',
+        coordinates,
         host: {
           uid: currentUser?.uid || 'guest_host',
           displayName: currentUser?.displayName || 'Host Player',
-          photoURL: currentUser?.photoURL || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100'
+          photoURL: currentUser?.photoURL || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100',
+          karmaScore: currentUser?.karmaScore || 100
         },
         playerUids: [currentUser?.uid || 'guest_host']
       });
@@ -143,7 +156,6 @@ export const MatchmakerModal: React.FC<MatchmakerModalProps> = ({
             <p className="text-xs text-slate-400 mb-4">Specify how many players you need in this lobby.</p>
 
             <div className="space-y-4 mb-6">
-              {/* Custom Players Counter */}
               <div className="p-4 rounded-2xl bg-slate-900/90 border border-white/15">
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-xs font-bold text-slate-200 uppercase tracking-wider flex items-center gap-1.5">
@@ -181,7 +193,6 @@ export const MatchmakerModal: React.FC<MatchmakerModalProps> = ({
                     </button>
                   </div>
 
-                  {/* Preset chips */}
                   <div className="flex flex-wrap gap-1.5">
                     {(sportCapacityPresets[sport] || [4, 10, 16]).map((num) => (
                       <button
@@ -201,7 +212,6 @@ export const MatchmakerModal: React.FC<MatchmakerModalProps> = ({
                 </div>
               </div>
 
-              {/* Format */}
               <div>
                 <label className="text-xs font-bold text-slate-300 uppercase tracking-wider block mb-1.5">Match Format</label>
                 <div className="grid grid-cols-2 gap-2">
@@ -225,7 +235,6 @@ export const MatchmakerModal: React.FC<MatchmakerModalProps> = ({
                 </div>
               </div>
 
-              {/* Skill */}
               <div>
                 <label className="text-xs font-bold text-slate-300 uppercase tracking-wider block mb-1.5">Skill Level</label>
                 <select
@@ -252,26 +261,26 @@ export const MatchmakerModal: React.FC<MatchmakerModalProps> = ({
                 onClick={handleNext} 
                 className="w-2/3 py-3.5 rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 text-white font-extrabold text-xs uppercase tracking-wider glow-orange transition flex items-center justify-center gap-2"
               >
-                <span>Continue to Venue & Time</span>
+                <span>Continue to Venue & Payment</span>
                 <ArrowRight className="w-4 h-4" />
               </button>
             </div>
           </div>
         )}
 
-        {/* Step 3: Location & Time */}
+        {/* Step 3: Location, Turf Cost & Host UPI ID */}
         {step === 3 && (
           <div>
-            <h3 className="font-display font-extrabold text-xl text-white mb-1">Select Venue & Time Slot</h3>
-            <p className="text-xs text-slate-400 mb-4">Choose preferred hub for this {totalPlayers}-player match.</p>
+            <h3 className="font-display font-extrabold text-xl text-white mb-1">Venue & Payment Setup</h3>
+            <p className="text-xs text-slate-400 mb-4">Set turf location and optional automated UPI splitting.</p>
 
-            <div className="space-y-4 mb-6">
+            <div className="space-y-3.5 mb-6">
               <div>
                 <label className="text-xs font-bold text-slate-300 uppercase tracking-wider block mb-1.5">Location Hub</label>
                 <select 
                   value={location}
                   onChange={(e) => setLocation(e.target.value)}
-                  className="w-full px-4 py-3 rounded-xl bg-slate-900 border border-white/15 text-xs text-white focus:outline-none focus:border-orange-500"
+                  className="w-full px-4 py-2.5 rounded-xl bg-slate-900 border border-white/15 text-xs text-white focus:outline-none focus:border-orange-500"
                 >
                   <option value="Greater Noida (Pari Chowk & KP3)">Greater Noida (Pari Chowk & KP3)</option>
                   <option value="Noida Sector 62 / 104">Noida Sector 62 / 104</option>
@@ -285,13 +294,37 @@ export const MatchmakerModal: React.FC<MatchmakerModalProps> = ({
                 <select 
                   value={time}
                   onChange={(e) => setTime(e.target.value)}
-                  className="w-full px-4 py-3 rounded-xl bg-slate-900 border border-white/15 text-xs text-white focus:outline-none focus:border-orange-500"
+                  className="w-full px-4 py-2.5 rounded-xl bg-slate-900 border border-white/15 text-xs text-white focus:outline-none focus:border-orange-500"
                 >
                   <option value="Tonight (8:00 PM - 10:00 PM)">Tonight (8:00 PM - 10:00 PM)</option>
                   <option value="Tomorrow Morning (7:00 AM - 9:00 AM)">Tomorrow Morning (7:00 AM - 9:00 AM)</option>
                   <option value="Tomorrow Evening (6:30 PM - 8:30 PM)">Tomorrow Evening (6:30 PM - 8:30 PM)</option>
                   <option value="Weekend Special (5:00 PM - 7:00 PM)">Weekend Special (5:00 PM - 7:00 PM)</option>
                 </select>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3 pt-2 border-t border-white/10">
+                <div>
+                  <label className="text-[11px] font-bold text-slate-300 uppercase tracking-wider block mb-1">Total Turf Cost (₹)</label>
+                  <input
+                    type="number"
+                    value={turfCost}
+                    onChange={(e) => setTurfCost(Number(e.target.value) || 0)}
+                    placeholder="1200"
+                    className="w-full px-3.5 py-2 rounded-xl bg-slate-900 border border-white/15 text-xs text-white focus:outline-none focus:border-orange-500 font-bold"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-[11px] font-bold text-slate-300 uppercase tracking-wider block mb-1">Host UPI ID</label>
+                  <input
+                    type="text"
+                    value={hostUpiId}
+                    onChange={(e) => setHostUpiId(e.target.value)}
+                    placeholder="name@okaxis"
+                    className="w-full px-3.5 py-2 rounded-xl bg-slate-900 border border-white/15 text-xs text-white focus:outline-none focus:border-orange-500 font-mono text-[11px]"
+                  />
+                </div>
               </div>
             </div>
 

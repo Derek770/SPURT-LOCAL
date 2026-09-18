@@ -9,18 +9,33 @@ import { MatchmakerModal } from '@/components/MatchmakerModal';
 import { SquadChatModal } from '@/components/SquadChatModal';
 import { WarmUpArenaModal } from '@/components/WarmUpArenaModal';
 import { WarmUpFAB } from '@/components/WarmUpFAB';
+import { UpiTurfSplitterModal } from '@/components/UpiTurfSplitterModal';
+import { TeamBalancerModal } from '@/components/TeamBalancerModal';
+import { MvpVotingModal } from '@/components/MvpVotingModal';
 import { useAuth } from '@/context/AuthContext';
 import { MatchItem, SportType } from '@/types';
-import { subscribeToMatches, createMatch, joinMatch, leaveMatch } from '@/lib/matches';
-import { ShieldCheck, Trophy, Zap, MapPin, Heart } from 'lucide-react';
+import { 
+  subscribeToMatches, 
+  createMatch, 
+  joinMatch, 
+  leaveMatch,
+  toggleSosBeacon,
+  checkInPlayer
+} from '@/lib/matches';
+import { ShieldCheck, Trophy, Zap, MapPin, Heart, Flame } from 'lucide-react';
 
 export default function Home() {
   const { userProfile } = useAuth();
   const [matches, setMatches] = useState<MatchItem[]>([]);
   const [selectedSport, setSelectedSport] = useState<SportType>('all');
   const [isMatchmakerOpen, setIsMatchmakerOpen] = useState(false);
-  const [selectedChatMatch, setSelectedChatMatch] = useState<MatchItem | null>(null);
   const [isWarmUpOpen, setIsWarmUpOpen] = useState(false);
+  
+  // Modals state
+  const [selectedChatMatch, setSelectedChatMatch] = useState<MatchItem | null>(null);
+  const [selectedSplitterMatch, setSelectedSplitterMatch] = useState<MatchItem | null>(null);
+  const [selectedBalancerMatch, setSelectedBalancerMatch] = useState<MatchItem | null>(null);
+  const [selectedMvpMatch, setSelectedMvpMatch] = useState<MatchItem | null>(null);
   const [selectedLocation, setSelectedLocation] = useState('Greater Noida');
 
   useEffect(() => {
@@ -71,16 +86,44 @@ export default function Home() {
     }
   };
 
+  const handleToggleSos = async (match: MatchItem) => {
+    try {
+      await toggleSosBeacon(match.id, !match.isSosActive);
+    } catch (err) {
+      console.error('Failed to toggle SOS:', err);
+    }
+  };
+
+  const handleCheckIn = async (match: MatchItem) => {
+    if (!userProfile) {
+      window.location.href = '/login';
+      return;
+    }
+    try {
+      await checkInPlayer(match.id, userProfile);
+      alert('✓ Checked in successfully! +5 Athlete Karma awarded.');
+    } catch (err) {
+      console.error('Failed to check in:', err);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-[#070D18] relative text-slate-100 selection:bg-orange-500 selection:text-white pb-20">
       
-      {/* Dynamic Live Ticker Header */}
+      {/* Dynamic Live Ticker Header with SOS Alerts */}
       {matches.length > 0 && (
         <div className="bg-slate-900/90 border-b border-white/10 py-2 overflow-hidden sticky top-0 z-50 backdrop-blur-md">
           <div className="animate-ticker flex items-center gap-12 whitespace-nowrap text-xs text-slate-300 font-semibold tracking-wide">
             {matches.map((m) => (
               <span key={m.id} className="flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                {m.isSosActive ? (
+                  <span className="flex items-center gap-1 text-red-400 font-black animate-pulse">
+                    <Flame className="w-3.5 h-3.5 fill-red-400" />
+                    <span>[🚨 SOS DROPOUT]</span>
+                  </span>
+                ) : (
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                )}
                 <span className="text-orange-400 font-bold uppercase">{m.sport}:</span>
                 <span>{m.title} at {m.venue}</span>
                 <span className="text-emerald-300">({m.filledSlots}/{m.totalSlots} joined)</span>
@@ -105,7 +148,7 @@ export default function Home() {
         onOpenMatchmaker={handleOpenMatchmaker}
       />
 
-      {/* Match Feed */}
+      {/* Match Feed & Interactive Pitch Radar */}
       <MatchFeed 
         matches={matches}
         currentSport={selectedSport}
@@ -115,46 +158,51 @@ export default function Home() {
         onLeaveMatch={handleLeaveMatch}
         onOpenMatchmaker={handleOpenMatchmaker}
         onOpenChat={(match) => setSelectedChatMatch(match)}
+        onOpenSplitter={(match) => setSelectedSplitterMatch(match)}
+        onOpenBalancer={(match) => setSelectedBalancerMatch(match)}
+        onOpenMvp={(match) => setSelectedMvpMatch(match)}
+        onToggleSos={handleToggleSos}
+        onCheckIn={handleCheckIn}
       />
 
       {/* Sport Category Cards */}
       <SportCards onSelectSport={handleSelectSport} />
 
-      {/* How it Works / Value Props */}
+      {/* How it Works / 6 Features */}
       <section id="how-it-works" className="py-16 px-4 sm:px-6 max-w-7xl mx-auto">
         <div className="text-center max-w-2xl mx-auto mb-12">
-          <div className="text-xs uppercase font-extrabold tracking-widest text-emerald-400">Simple 3-Step Matchmaker</div>
-          <h2 className="font-display font-extrabold text-3xl sm:text-4xl text-white mt-2">How Spurt Local Works</h2>
+          <div className="text-xs uppercase font-extrabold tracking-widest text-emerald-400">Next-Gen Local Matchmaking</div>
+          <h2 className="font-display font-extrabold text-3xl sm:text-4xl text-white mt-2">Built for Pure Competition</h2>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="glass-card rounded-3xl p-8 border border-white/10 text-center">
             <div className="w-14 h-14 mx-auto rounded-2xl bg-orange-500/20 border border-orange-500/40 flex items-center justify-center text-orange-400 font-black text-xl mb-6 shadow-lg">
-              1
+              🛡️
             </div>
-            <h3 className="font-bold text-lg text-white mb-2">Find or Host a Lobby</h3>
+            <h3 className="font-bold text-lg text-white mb-2">Ghost-Shield Karma</h3>
             <p className="text-xs text-slate-400 leading-relaxed">
-              Select your sport, specify exact team capacity (from 2 to 32 players), skill level, and local NCR turf venue.
+              100-point reliability score. Verified on-pitch check-ins award +5 Karma; no-shows get penalized.
             </p>
           </div>
 
           <div className="glass-card rounded-3xl p-8 border border-white/10 text-center">
             <div className="w-14 h-14 mx-auto rounded-2xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400 font-black text-xl mb-6 shadow-lg">
-              2
+              💸
             </div>
-            <h3 className="font-bold text-lg text-white mb-2">Squad Chat & Real-Time Roster</h3>
+            <h3 className="font-bold text-lg text-white mb-2">In-Chat UPI Splitter</h3>
             <p className="text-xs text-slate-400 leading-relaxed">
-              Every match has a dedicated live squad chat room. Coordinate arrival times, jersey colors, and pitch navigation.
+              Automatic cost-per-head breakdown and instant GPay/PhonePe/Paytm QR code payments.
             </p>
           </div>
 
           <div className="glass-card rounded-3xl p-8 border border-white/10 text-center">
             <div className="w-14 h-14 mx-auto rounded-2xl bg-cyan-500/20 border border-cyan-500/40 flex items-center justify-center text-cyan-400 font-black text-xl mb-6 shadow-lg">
-              3
+              🗺️
             </div>
-            <h3 className="font-bold text-lg text-white mb-2">Show Up & Play</h3>
+            <h3 className="font-bold text-lg text-white mb-2">NCR Pitch Radar</h3>
             <p className="text-xs text-slate-400 leading-relaxed">
-              Arrive at the verified turf venue and play. Guaranteed full rosters with zero ghosting.
+              Interactive cyber radar map showing live match venues across Greater Noida, Noida, and Delhi.
             </p>
           </div>
         </div>
@@ -162,14 +210,6 @@ export default function Home() {
 
       {/* Footer */}
       <footer className="border-t border-white/10 pt-12 pb-8 px-4 sm:px-6 max-w-7xl mx-auto text-center text-xs text-slate-400">
-        <div className="flex items-center justify-center gap-2 mb-3">
-          <div className="w-7 h-7 rounded-xl bg-gradient-to-tr from-cyan-500 via-emerald-400 to-orange-500 flex items-center justify-center text-white font-black text-xs shadow-md">
-            <Zap className="w-3.5 h-3.5 fill-white text-white" />
-          </div>
-          <span className="font-display font-black text-base text-white tracking-tight">
-            SPURT<span className="text-orange-400">LOCAL</span>
-          </span>
-        </div>
         <p className="mb-2">
           © 2026 SPURT LOCAL. Designed & Created with ⚡ by <strong className="text-slate-200">Yashwant Sonkar</strong>.
         </p>
@@ -178,7 +218,7 @@ export default function Home() {
         </p>
       </footer>
 
-      {/* Matchmaker Modal */}
+      {/* Modals Suite */}
       <MatchmakerModal 
         isOpen={isMatchmakerOpen}
         onClose={() => setIsMatchmakerOpen(false)}
@@ -186,7 +226,6 @@ export default function Home() {
         currentUser={userProfile}
       />
 
-      {/* Real-Time Squad Chat Modal */}
       <SquadChatModal 
         isOpen={!!selectedChatMatch}
         match={selectedChatMatch}
@@ -194,14 +233,34 @@ export default function Home() {
         onClose={() => setSelectedChatMatch(null)}
       />
 
-      {/* Warm-Up Arena Modal */}
       <WarmUpArenaModal
         isOpen={isWarmUpOpen}
         onClose={() => setIsWarmUpOpen(false)}
         currentUser={userProfile}
       />
 
-      {/* Floating Warm-Up Action Button */}
+      <UpiTurfSplitterModal
+        isOpen={!!selectedSplitterMatch}
+        match={selectedSplitterMatch}
+        currentUser={userProfile}
+        onClose={() => setSelectedSplitterMatch(null)}
+      />
+
+      <TeamBalancerModal
+        isOpen={!!selectedBalancerMatch}
+        match={selectedBalancerMatch}
+        currentUser={userProfile}
+        onClose={() => setSelectedBalancerMatch(null)}
+      />
+
+      <MvpVotingModal
+        isOpen={!!selectedMvpMatch}
+        match={selectedMvpMatch}
+        currentUser={userProfile}
+        onClose={() => setSelectedMvpMatch(null)}
+      />
+
+      {/* Floating Action Button */}
       <WarmUpFAB onOpen={() => setIsWarmUpOpen(true)} />
 
     </div>
